@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { Loader2 } from "lucide-react"
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter()
+    const params = useParams()
+    const locale = params.locale as string || 'en'
     const [loading, setLoading] = useState(true)
     const [authorized, setAuthorized] = useState(false)
 
@@ -14,12 +16,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         const checkAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
-                router.push("/en/login") // Default to EN login, or detect locale?
-                // Better: just /login and let middleware handle it?
-                // Problem: /login might default to /kz/login.
-                // Let's rely on middleware: router.push('/login') might fail if not handled by Link.
-                // Let's prefer hard redirect to /admin/login relative to current path?
-                // Actually, let's just push to /en/login for now or try to extract locale.
+                router.push(`/${locale}/login`)
             } else {
                 setAuthorized(true)
             }
@@ -31,7 +28,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT') {
                 setAuthorized(false)
-                router.push("/en/login")
+                router.push(`/${locale}/login`)
             } else if (session) {
                 setAuthorized(true)
             }
@@ -40,7 +37,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         return () => {
             subscription.unsubscribe()
         }
-    }, [router])
+    }, [router, locale])
 
     if (loading) {
         return (

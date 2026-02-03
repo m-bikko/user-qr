@@ -3,12 +3,17 @@ import { ProductClient } from "@/components/admin/product-client"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 
-export default async function ProductsPage() {
+export default async function ProductsPage({
+    params
+}: {
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect('/admin/login')
+        redirect(`/${locale}/login`)
     }
 
     const { data: profile } = await supabase

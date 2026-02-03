@@ -3,12 +3,17 @@ import { CategoryClient } from "@/components/admin/category-client"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 
-export default async function CategoriesPage() {
+export default async function CategoriesPage({
+    params
+}: {
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect('/admin/login')
+        redirect(`/${locale}/login`)
     }
 
     const { data: profile } = await supabase

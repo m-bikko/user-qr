@@ -92,7 +92,7 @@ export function AdminNav({
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
-        router.push(`/${locale}/admin/login`)
+        router.push(`/${locale}/login`)
     }
 
     const activeRestaurant = restaurants.find(r => r.id === selectedRestaurantId)

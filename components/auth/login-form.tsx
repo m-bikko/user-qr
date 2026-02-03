@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +10,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function LoginForm() {
     const router = useRouter()
+    const params = useParams()
+    const locale = params.locale as string || 'en'
+
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
@@ -29,7 +32,7 @@ export function LoginForm() {
             if (error) {
                 setError(error.message)
             } else {
-                router.push("/admin")
+                router.push(`/${locale}/admin`)
                 router.refresh()
             }
         } catch (err) {
