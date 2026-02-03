@@ -38,7 +38,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { Database } from "@/types/supabase"
 import imageCompression from 'browser-image-compression'
 
@@ -121,6 +121,8 @@ export function ProductClient({
     const [products, setProducts] = useState<Product[]>(initialProducts)
     const [isOpen, setIsOpen] = useState(false)
     const router = useRouter()
+    const params = useParams()
+    const locale = params.locale as string || 'en'
 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
@@ -502,37 +504,91 @@ export function ProductClient({
                 </Dialog>
             </div>
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>{t('name_en')}</TableHead>
-                            <TableHead>{t('category')}</TableHead>
-                            <TableHead>{t('price')}</TableHead>
-                            <TableHead className="text-right">{t('actions')}</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {products.map((product) => (
-                            <TableRow key={product.id}>
-                                <TableCell className="font-medium">{product.name_en}</TableCell>
-                                <TableCell>{getCatName(product.category_id)}</TableCell>
-                                <TableCell>{product.price}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>{t('edit')}</Button>
-                                    <Button variant="destructive" size="sm" onClick={() => deleteProduct(product.id)}>{t('delete')}</Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {products.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={4} className="h-24 text-center">
-                                    {t('no_products')}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+            {/* Categories Loop */}
+            <div className="space-y-8">
+                {categories.map((category) => {
+                    const categoryProducts = products.filter(p => p.category_id === category.id)
+                    // Dynamic key access for localized name
+                    const categoryName = category[`name_${locale}` as keyof typeof category] as string || category.name_en
+
+                    return (
+                        <div key={category.id} className="space-y-4">
+                            <h3 className="text-xl font-bold flex items-center gap-2">
+                                {categoryName}
+                                <span className="text-sm font-normal text-muted-foreground">({categoryProducts.length})</span>
+                            </h3>
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{t('name_en')}</TableHead>
+                                            <TableHead>{t('price')}</TableHead>
+                                            <TableHead className="text-right">{t('actions')}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {categoryProducts.map((product) => (
+                                            <TableRow key={product.id}>
+                                                <TableCell className="font-medium">
+                                                    <div className="flex flex-col">
+                                                        <span>{product.name_en}</span>
+                                                        {locale !== 'en' && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {product[`name_${locale}` as keyof typeof product] as string}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>{product.price}</TableCell>
+                                                <TableCell className="text-right space-x-2">
+                                                    <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>{t('edit')}</Button>
+                                                    <Button variant="destructive" size="sm" onClick={() => deleteProduct(product.id)}>{t('delete')}</Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {categoryProducts.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={3} className="h-16 text-center text-muted-foreground text-sm">
+                                                    {t('no_products_in_category', { defaultMessage: 'No products in this category' })}
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+                    )
+                })}
+
+                {/* Uncategorized Products (if any) */}
+                {products.filter(p => !p.category_id).length > 0 && (
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold text-muted-foreground">{t('uncategorized', { defaultMessage: 'Uncategorized' })}</h3>
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t('name_en')}</TableHead>
+                                        <TableHead>{t('price')}</TableHead>
+                                        <TableHead className="text-right">{t('actions')}</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {products.filter(p => !p.category_id).map((product) => (
+                                        <TableRow key={product.id}>
+                                            <TableCell className="font-medium">{product.name_en}</TableCell>
+                                            <TableCell>{product.price}</TableCell>
+                                            <TableCell className="text-right space-x-2">
+                                                <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>{t('edit')}</Button>
+                                                <Button variant="destructive" size="sm" onClick={() => deleteProduct(product.id)}>{t('delete')}</Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
