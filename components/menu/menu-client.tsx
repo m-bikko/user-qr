@@ -23,10 +23,16 @@ type Category = Database['public']['Tables']['categories']['Row']
 
 export function MenuClient({
     categories,
-    products
+    products,
+    restaurantSlug,
+    restaurantName,
+    restaurantLogo
 }: {
     categories: Category[],
-    products: Product[]
+    products: Product[],
+    restaurantSlug: string,
+    restaurantName: string,
+    restaurantLogo: string | null
 }) {
     const t = useTranslations('Index')
     const locale = useLocale()
@@ -63,7 +69,7 @@ export function MenuClient({
 
         if (hasOptions) {
             // Redirect to details if options exist (must choose)
-            window.location.href = `/${locale}/product/${product.id}`
+            window.location.href = `/${locale}/${restaurantSlug}/product/${product.id}`
         } else {
             // No options, direct add
             addItem(product, 1, [])
@@ -91,9 +97,6 @@ export function MenuClient({
         if (!element) return;
 
         // Account for sticky header (approx 110px)
-        // scroll-mt-36 is 9rem = 144px, usually handles this via CSS scroll-margin-top
-        // But for JS scrollTo, we need to calculate exact position or trust scroll-margin if using scrollIntoView?
-        // JS window.scrollTo ignores scroll-margin. We need to calculate manually.
         const headerOffset = 120;
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -126,7 +129,18 @@ export function MenuClient({
         <div className="relative min-h-screen pb-24 bg-background">
             {/* Header / Lang Switcher */}
             <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <h1 className="font-bold text-lg">{t('menu_title')}</h1>
+                <div className="flex items-center gap-3">
+                    {restaurantLogo ? (
+                        <div className="relative w-8 h-8 rounded-full overflow-hidden border">
+                            <Image src={restaurantLogo} alt={restaurantName} fill className="object-cover" />
+                        </div>
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border">
+                            {restaurantName.substring(0, 2).toUpperCase()}
+                        </div>
+                    )}
+                    <h1 className="font-bold text-lg truncate max-w-[200px]">{restaurantName}</h1>
+                </div>
                 <LanguageSwitcher />
             </div>
 
@@ -158,7 +172,7 @@ export function MenuClient({
                                 const productDesc = getLocalized(product, 'description')
                                 return (
                                     <div key={product.id} className="relative group">
-                                        <Link href={`/${locale}/product/${product.id}`} className="flex gap-4 p-4 rounded-xl bg-card border shadow-sm hover:shadow-md transition-all">
+                                        <Link href={`/${locale}/${restaurantSlug}/product/${product.id}`} className="flex gap-4 p-4 rounded-xl bg-card border shadow-sm hover:shadow-md transition-all">
                                             {/* Image */}
                                             <div className="relative aspect-square w-28 h-28 rounded-lg bg-muted overflow-hidden shrink-0">
                                                 {product.image_url ? (

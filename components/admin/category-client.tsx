@@ -37,7 +37,7 @@ type Category = Database['public']['Tables']['categories']['Row']
 
 import { useTranslations } from "next-intl"
 
-export function CategoryClient({ initialCategories }: { initialCategories: Category[] }) {
+export function CategoryClient({ initialCategories, restaurantId }: { initialCategories: Category[], restaurantId: string }) {
     const t = useTranslations('Admin')
     const [categories, setCategories] = useState<Category[]>(initialCategories)
     const [isOpen, setIsOpen] = useState(false)
@@ -46,7 +46,7 @@ export function CategoryClient({ initialCategories }: { initialCategories: Categ
     const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
     const formSchema = z.object({
-        name_en: z.string().min(1, t('name_en') + " required"), // Simplified validation msg for now
+        name_en: z.string().min(1, t('name_en') + " required"),
         name_ru: z.string().min(1, t('name_ru') + " required"),
         name_kz: z.string().min(1, t('name_kz') + " required"),
         sort_order: z.coerce.number().int().default(0),
@@ -98,7 +98,7 @@ export function CategoryClient({ initialCategories }: { initialCategories: Categ
             } else {
                 const { data, error } = await supabase
                     .from('categories')
-                    .insert([values])
+                    .insert([{ ...values, restaurant_id: restaurantId }])
                     .select()
                     .single()
                 result = { data, error }

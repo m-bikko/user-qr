@@ -110,10 +110,12 @@ function OptionChoices({ nestIndex, control }: { nestIndex: number, control: any
 
 export function ProductClient({
     initialProducts,
-    categories
+    categories,
+    restaurantId
 }: {
     initialProducts: Product[],
-    categories: Category[]
+    categories: Category[],
+    restaurantId: string
 }) {
     const t = useTranslations('Admin')
     const [products, setProducts] = useState<Product[]>(initialProducts)
@@ -237,7 +239,7 @@ export function ProductClient({
             } else {
                 const { data, error } = await supabase
                     .from('products')
-                    .insert([values])
+                    .insert([{ ...values, restaurant_id: restaurantId }])
                     .select()
                     .single()
                 result = { data, error }

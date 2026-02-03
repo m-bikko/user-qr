@@ -15,7 +15,9 @@
         "add_choice": "Add Choice",
         "select_option": "Please select a option for",
         "options": "Options",
-        "menu_title": "Menu"
+        "menu_title": "Menu",
+        "welcome_title": "Welcome",
+        "select_restaurant": "Please select a restaurant to view the menu"
     },
     "Admin": {
         "dashboard": "Dashboard",
@@ -55,6 +57,8 @@
         "delete_group": "Delete Group",
         "admin_title": "Restaurant Admin",
         "dashboard_title": "Admin Dashboard",
-        "welcome_message": "Welcome to the admin panel."
+        "welcome_message": "Welcome to the admin panel.",
+        "menu_title": "Menu",
+        "restaurants": "Restaurants"
     }
 }

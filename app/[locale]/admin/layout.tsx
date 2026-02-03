@@ -1,17 +1,20 @@
 import { AdminGuard } from "@/components/auth/admin-guard"
 import { AdminNav } from "@/components/admin/admin-nav"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { cookies } from "next/headers"
 
-export default function AdminLayout({
+export default async function AdminLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    const t = useTranslations('Admin')
+    const t = await getTranslations('Admin')
+    const cookieStore = await cookies()
+    const contextRestaurantId = cookieStore.get('admin_context_restaurant_id')
 
     return (
         <AdminGuard>
@@ -29,7 +32,7 @@ export default function AdminLayout({
                                 <SheetContent side="left" className="w-[240px] sm:w-[300px]">
                                     <SheetTitle className="sr-only">Menu</SheetTitle>
                                     <div className="px-1 py-6">
-                                        <AdminNav />
+                                        <AdminNav initialRestaurantId={contextRestaurantId?.value} />
                                     </div>
                                 </SheetContent>
                             </Sheet>
@@ -40,7 +43,7 @@ export default function AdminLayout({
                 </header>
                 <div className="container grid flex-1 gap-12 md:grid-cols-[240px_1fr]">
                     <aside className="hidden w-[240px] flex-col md:flex pl-6">
-                        <AdminNav />
+                        <AdminNav initialRestaurantId={contextRestaurantId?.value} />
                     </aside>
                     <main className="flex w-full flex-1 flex-col overflow-hidden">
                         {children}

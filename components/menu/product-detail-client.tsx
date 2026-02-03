@@ -24,10 +24,12 @@ type OptionGroup = {
 
 export function ProductDetailClient({
     product,
-    recommendations
+    recommendations,
+    restaurantSlug
 }: {
     product: Product,
-    recommendations: Product[]
+    recommendations: Product[],
+    restaurantSlug: string
 }) {
     const router = useRouter()
     const t = useTranslations('Index')
@@ -103,7 +105,7 @@ export function ProductDetailClient({
         )
 
         addItem(product, quantity, cartOptions)
-        router.back()
+        router.push(`/${locale}/${restaurantSlug}`)
     }
 
     // Calculate total price
@@ -115,7 +117,7 @@ export function ProductDetailClient({
 
     return (
         <div className="container max-w-lg mx-auto p-4 space-y-6 pb-24">
-            <Button variant="ghost" className="pl-0 gap-2 mb-4" onClick={() => router.back()}>
+            <Button variant="ghost" className="pl-0 gap-2 mb-4" onClick={() => router.push(`/${locale}/${restaurantSlug}`)}>
                 <ChevronLeft className="w-4 h-4" /> {t('back_to_menu')}
             </Button>
 
@@ -198,7 +200,7 @@ export function ProductDetailClient({
                     <h3 className="font-bold text-lg">{t('recommended')}</h3>
                     <div className="grid grid-cols-2 gap-4">
                         {recommendations.map(rec => (
-                            <Link key={rec.id} href={`/${locale}/product/${rec.id}`} className="block space-y-2 group">
+                            <Link key={rec.id} href={`/${locale}/${restaurantSlug}/product/${rec.id}`} className="block space-y-2 group">
                                 <div className="relative aspect-square rounded-lg bg-muted overflow-hidden">
                                     {rec.image_url && <Image src={rec.image_url} alt={getLocalized(rec, 'name')} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />}
                                 </div>

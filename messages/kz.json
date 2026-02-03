@@ -15,12 +15,15 @@
         "add_choice": "Таңдау қосу",
         "select_option": "Опцияны таңдаңыз",
         "options": "Опциялар",
-        "menu_title": "Мәзір"
+        "menu_title": "Мәзір",
+        "welcome_title": "Қош келдіңіз",
+        "select_restaurant": "Мәзірді көру үшін мейрамхананы таңдаңыз"
     },
     "Admin": {
         "dashboard": "Басқару тақтасы",
         "categories": "Санаттар",
         "products": "Өнімдер",
+        "restaurants": "Мейрамханалар",
         "logout": "Шығу",
         "name_en": "Атауы (EN)",
         "name_ru": "Атауы (RU)",
@@ -55,6 +58,8 @@
         "delete_group": "Топты жою",
         "admin_title": "Мейрамхана әкімшісі",
         "dashboard_title": "Әкімші дашборды",
-        "welcome_message": "Әкімші тақтасына қош келдіңіз."
+        "welcome_message": "Әкімші тақтасына қош келдіңіз.",
+        "menu_title": "Мәзір",
+        "restaurants": "Мейрамханалар"
     }
 }

@@ -1,0 +1,46 @@
+import { supabase } from "@/lib/supabase"
+import { MenuClient } from "@/components/menu/menu-client"
+import { notFound } from "next/navigation"
+
+export default async function MenuPage({
+    params
+}: {
+    params: Promise<{ restaurantSlug: string }>
+}) {
+    const { restaurantSlug } = await params
+
+    // Fetch restaurant
+    const { data: restaurant } = await supabase
+        .from('restaurants')
+        .select('id, name, logo_url')
+        .eq('slug', restaurantSlug)
+        .single()
+
+    if (!restaurant) {
+        notFound()
+    }
+
+    const { data: categories } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('restaurant_id', restaurant.id)
+        .order('sort_order', { ascending: true })
+
+    const { data: products } = await supabase
+        .from('products')
+        .select('*')
+        .eq('restaurant_id', restaurant.id)
+        .order('created_at', { ascending: false })
+
+    return (
+        <div className="bg-zinc-50 dark:bg-zinc-950 min-h-screen">
+            <MenuClient
+                categories={categories || []}
+                products={products || []}
+                restaurantSlug={restaurantSlug}
+                restaurantName={restaurant.name}
+                restaurantLogo={restaurant.logo_url}
+            />
+        </div>
+    )
+}

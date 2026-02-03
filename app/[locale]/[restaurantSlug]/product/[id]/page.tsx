@@ -5,9 +5,9 @@ import { notFound } from "next/navigation"
 export default async function ProductDetailPage({
     params
 }: {
-    params: Promise<{ id: string }>
+    params: Promise<{ id: string, restaurantSlug: string }>
 }) {
-    const { id } = await params
+    const { id, restaurantSlug } = await params
 
     // Fetch product
     const { data: product, error } = await supabase
@@ -37,6 +37,7 @@ export default async function ProductDetailPage({
             <ProductDetailClient
                 product={product}
                 recommendations={recommendations}
+                restaurantSlug={restaurantSlug}
             />
         </div>
     )

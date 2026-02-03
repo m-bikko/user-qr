@@ -15,12 +15,15 @@
         "add_choice": "Добавить выбор",
         "select_option": "Пожалуйста выберите опцию для",
         "options": "Опции",
-        "menu_title": "Меню"
+        "menu_title": "Меню",
+        "welcome_title": "Добро пожаловать",
+        "select_restaurant": "Пожауйста выберите ресторан"
     },
     "Admin": {
         "dashboard": "Дашборд",
         "categories": "Категории",
         "products": "Продукты",
+        "restaurants": "Рестораны",
         "logout": "Выйти",
         "name_en": "Название (EN)",
         "name_ru": "Название (RU)",
@@ -55,6 +58,8 @@
         "delete_group": "Удалить группу",
         "admin_title": "Админ панель ресторана",
         "dashboard_title": "Дашборд администратора",
-        "welcome_message": "Добро пожаловать в панель администратора."
+        "welcome_message": "Добро пожаловать в панель администратора.",
+        "menu_title": "Меню",
+        "restaurants": "Рестораны"
     }
 }
