@@ -110,11 +110,16 @@ export function AdminNav({
             show: profile?.role === 'super_admin' && !selectedRestaurantId
         },
         {
-            title: "Users",
+            title: t('users'),
             href: `/${locale}/admin/users`,
             show: profile?.role === 'super_admin' && !selectedRestaurantId
         },
         // Context-dependent items (Restaurant Edit Mode)
+        {
+            title: t('kitchens'),
+            href: `/${locale}/admin/kitchens`,
+            show: !!selectedRestaurantId
+        },
         {
             title: t('categories'),
             href: `/${locale}/admin/categories`,
@@ -133,7 +138,7 @@ export function AdminNav({
         <nav className="flex flex-col gap-2">
             <div className="px-2 mb-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('menu_title', { defaultMessage: 'Menu' })}</span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('menu_title')}</span>
                     {profile?.role === 'super_admin' && <span className="text-[10px] bg-primary/20 text-primary px-1 rounded">SUPER</span>}
                 </div>
 
@@ -157,7 +162,7 @@ export function AdminNav({
                                             <span className="truncate text-sm">{activeRestaurant?.name}</span>
                                         </>
                                     ) : (
-                                        <span className="text-muted-foreground text-xs">Select Restaurant...</span>
+                                        <span className="text-muted-foreground text-xs">{t('select_restaurant_placeholder')}</span>
                                     )}
                                 </div>
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -165,9 +170,9 @@ export function AdminNav({
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
-                                <CommandInput placeholder="Search restaurant..." />
+                                <CommandInput placeholder={t('search_restaurant_placeholder')} />
                                 <CommandList>
-                                    <CommandEmpty>No restaurant found.</CommandEmpty>
+                                    <CommandEmpty>{t('no_restaurant_found_cmd')}</CommandEmpty>
                                     <CommandGroup>
                                         <CommandItem
                                             value="all-clear"
@@ -175,7 +180,7 @@ export function AdminNav({
                                             className="font-medium text-muted-foreground"
                                         >
                                             <LayoutDashboard className="mr-2 h-4 w-4" />
-                                            Platform Overview
+                                            {t('platform_overview')}
                                             <Check
                                                 className={cn(
                                                     "ml-auto h-4 w-4",
@@ -212,7 +217,7 @@ export function AdminNav({
                         </Avatar>
                         <div className="flex flex-col overflow-hidden">
                             <span className="truncate font-medium">{restaurants[0]?.name || "Loading..."}</span>
-                            <span className="text-[10px] text-muted-foreground">Standard Plan</span>
+                            <span className="text-[10px] text-muted-foreground">{t('standard_plan')}</span>
                         </div>
                     </div>
                 )}

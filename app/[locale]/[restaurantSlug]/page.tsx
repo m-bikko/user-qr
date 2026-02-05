@@ -26,16 +26,24 @@ export default async function MenuPage({
         .eq('restaurant_id', restaurant.id)
         .order('sort_order', { ascending: true })
 
+    const { data: kitchens } = await supabase
+        .from('kitchens')
+        .select('*')
+        .eq('restaurant_id', restaurant.id)
+        .eq('is_available', true)
+        .order('sort_order', { ascending: true })
+
     const { data: products } = await supabase
         .from('products')
         .select('*')
         .eq('restaurant_id', restaurant.id)
-        .order('created_at', { ascending: false })
+        .order('sort_order', { ascending: true })
 
     return (
         <div className="bg-zinc-50 dark:bg-zinc-950 min-h-screen">
             <MenuClient
                 categories={categories || []}
+                kitchens={kitchens || []}
                 products={products || []}
                 restaurantSlug={restaurantSlug}
                 restaurantName={restaurant.name}

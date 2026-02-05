@@ -56,10 +56,6 @@ export function UserClient() {
     const [role, setRole] = useState<'super_admin' | 'restaurant_admin'>('restaurant_admin')
     const [restaurantId, setRestaurantId] = useState<string>("none")
 
-    useEffect(() => {
-        fetchData()
-    }, [])
-
     const fetchData = async () => {
         setLoading(true)
         const [profilesRes, restaurantsRes] = await Promise.all([
@@ -71,6 +67,10 @@ export function UserClient() {
         if (restaurantsRes.data) setRestaurants(restaurantsRes.data)
         setLoading(false)
     }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
 
     const handleEdit = (profile: Profile) => {
         setEditingProfile(profile)

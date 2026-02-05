@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Database } from "@/types/supabase"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useCartStore } from "@/store/cart-store"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,46 +14,59 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { Plus, Minus, ShoppingCart } from "lucide-react"
+import { Plus, Minus } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { cn } from "@/lib/utils"
 
 type Product = Database['public']['Tables']['products']['Row']
 type Category = Database['public']['Tables']['categories']['Row']
+type Kitchen = Database['public']['Tables']['kitchens']['Row']
 
 export function MenuClient({
     categories,
+    kitchens,
     products,
     restaurantSlug,
     restaurantName,
     restaurantLogo
 }: {
     categories: Category[],
+    kitchens: Kitchen[],
     products: Product[],
     restaurantSlug: string,
     restaurantName: string,
     restaurantLogo: string | null
 }) {
     const t = useTranslations('Index')
+    const router = useRouter()
     const locale = useLocale()
     const { items, addItem, updateQuantity, removeItem, totalPrice } = useCartStore()
     const [isMounted, setIsMounted] = useState(false)
+    const [selectedKitchenId, setSelectedKitchenId] = useState<string | null>(null)
 
     useEffect(() => {
         setIsMounted(true)
-    }, [])
+        if (kitchens.length > 0) {
+            setSelectedKitchenId(kitchens[0].id)
+        }
+    }, [kitchens])
 
     if (!isMounted) return null
-
-    const groupedProducts = categories.map(category => ({
-        ...category,
-        items: products.filter(p => p.category_id === category.id)
-    })).filter(g => g.items.length > 0)
 
     const getLocalized = (obj: any, field: string) => {
         return obj[`${field}_${locale}`] || obj[`${field}_en`] || ""
     }
+
+    // Filter categories by selected kitchen
+    const filteredCategories = selectedKitchenId
+        ? categories.filter(c => c.kitchen_id === selectedKitchenId)
+        : categories
+
+    const groupedProducts = filteredCategories.map(category => ({
+        ...category,
+        items: products.filter(p => p.category_id === category.id)
+    })).filter(g => g.items.length > 0)
 
     // Helper to get total quantity of a product in cart
     const getProductQuantity = (productId: string) => {
@@ -69,7 +83,7 @@ export function MenuClient({
 
         if (hasOptions) {
             // Redirect to details if options exist (must choose)
-            window.location.href = `/${locale}/${restaurantSlug}/product/${product.id}`
+            router.push(`/${locale}/${restaurantSlug}/product/${product.id}`)
         } else {
             // No options, direct add
             addItem(product, 1, [])
@@ -90,14 +104,15 @@ export function MenuClient({
         }
     }
 
-    // Custom smooth scroll function (1s duration)
+    // Custom smooth scroll function
     const scrollToCategory = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
         e.preventDefault();
         const element = document.getElementById(id);
         if (!element) return;
 
-        // Account for sticky header (approx 110px)
-        const headerOffset = 120;
+        // Account for sticky headers (Header 53px + Kitchens ~48px + Categories ~50px)
+        // Needs adjustment based on actual heights
+        const headerOffset = 160;
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -114,7 +129,6 @@ export function MenuClient({
             if (timeElapsed < duration) requestAnimationFrame(animation);
         }
 
-        // Ease in-out quadratic
         function ease(t: number, b: number, c: number, d: number) {
             t /= d / 2;
             if (t < 1) return c / 2 * t * t + b;
@@ -128,7 +142,7 @@ export function MenuClient({
     return (
         <div className="relative min-h-screen pb-24 bg-background">
             {/* Header / Lang Switcher */}
-            <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-[53px]">
                 <div className="flex items-center gap-3">
                     {restaurantLogo ? (
                         <div className="relative w-8 h-8 rounded-full overflow-hidden border">
@@ -144,8 +158,52 @@ export function MenuClient({
                 <LanguageSwitcher />
             </div>
 
-            {/* Category Nav */}
-            <div className="sticky top-[53px] z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b overflow-x-auto whitespace-nowrap py-3 px-4 scrollbar-hide">
+            {/* Kitchen Tabs - Scrollable Cards */}
+            {kitchens.length > 1 && (
+                <div className="relative bg-background border-b overflow-x-auto whitespace-nowrap py-2 px-4 scrollbar-hide">
+                    <div className="flex space-x-4">
+                        {kitchens.map(kitchen => (
+                            <button
+                                key={kitchen.id}
+                                onClick={() => setSelectedKitchenId(kitchen.id)}
+                                className={cn(
+                                    "group flex flex-col items-center gap-2 shrink-0 transition-opacity",
+                                    selectedKitchenId === kitchen.id ? "opacity-100" : "opacity-60 hover:opacity-100"
+                                )}
+                            >
+                                <div className={cn(
+                                    "relative w-28 aspect-[4/3] rounded-lg overflow-hidden border transition-all",
+                                    selectedKitchenId === kitchen.id ? "ring-2 ring-primary ring-offset-2" : "border-transparent"
+                                )}>
+                                    {kitchen.image_url ? (
+                                        <Image
+                                            src={kitchen.image_url}
+                                            alt={getLocalized(kitchen, 'name')}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-xs p-2 text-center whitespace-normal">
+                                            {t('no_image')}
+                                        </div>
+                                    )}
+                                </div>
+                                <span className={cn(
+                                    "text-sm font-medium",
+                                    selectedKitchenId === kitchen.id ? "text-primary" : "text-muted-foreground"
+                                )}>
+                                    {getLocalized(kitchen, 'name')}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Category Nav - Sticky under main header */}
+            <div className={cn(
+                "sticky top-[53px] z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b overflow-x-auto whitespace-nowrap py-3 px-4 scrollbar-hide"
+            )}>
                 <div className="flex space-x-2">
                     {groupedProducts.map(cat => (
                         <a
@@ -157,12 +215,17 @@ export function MenuClient({
                             {getLocalized(cat, 'name')}
                         </a>
                     ))}
+                    {groupedProducts.length === 0 && (
+                        <span className="text-sm text-muted-foreground py-2">
+                            {t('no_categories', { defaultMessage: "No categories in this kitchen" })}
+                        </span>
+                    )}
                 </div>
             </div>
 
             <div className="container mx-auto px-4 py-8 space-y-10 max-w-xl">
                 {groupedProducts.map(category => (
-                    <div key={category.id} id={`cat-${category.id}`} className="scroll-mt-36 space-y-4">
+                    <div key={category.id} id={`cat-${category.id}`} className="scroll-mt-48 space-y-4">
                         <h2 className="text-2xl font-bold tracking-tight">{getLocalized(category, 'name')}</h2>
 
                         <div className="space-y-4">
@@ -238,6 +301,11 @@ export function MenuClient({
                         </div>
                     </div>
                 ))}
+                {groupedProducts.length === 0 && (
+                    <div className="text-center py-20 text-muted-foreground">
+                        {t('no_products', { defaultMessage: "No products available." })}
+                    </div>
+                )}
             </div>
 
             {/* Sticky Cart Button */}

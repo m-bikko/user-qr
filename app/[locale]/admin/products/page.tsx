@@ -52,7 +52,7 @@ export default async function ProductsPage({
         .from('products')
         .select('*')
         .eq('restaurant_id', restaurantId)
-        .order('created_at', { ascending: false })
+        .order('sort_order', { ascending: true })
 
     const { data: categories, error: catError } = await supabase
         .from('categories')
@@ -60,7 +60,12 @@ export default async function ProductsPage({
         .eq('restaurant_id', restaurantId)
         .order('sort_order', { ascending: true })
 
-    if (prodError || catError) {
+    const { data: kitchens, error: kitchenError } = await supabase
+        .from('kitchens')
+        .select('*')
+        .eq('restaurant_id', restaurantId)
+
+    if (prodError || catError || kitchenError) {
         return <div>Error loading data</div>
     }
 
@@ -69,7 +74,12 @@ export default async function ProductsPage({
             <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Products</h2>
             </div>
-            <ProductClient initialProducts={products || []} categories={categories || []} restaurantId={restaurantId} />
+            <ProductClient
+                initialProducts={products || []}
+                categories={categories || []}
+                kitchens={kitchens || []}
+                restaurantId={restaurantId}
+            />
         </div>
     )
 }

@@ -138,7 +138,7 @@ export default function RestaurantsPage() {
 
         // For new restaurant, require email/password
         if (!editingRestaurant && (!email || !password)) {
-            alert("Email and Password are required for new restaurants")
+            alert(t('email_required_error'))
             return
         }
 
@@ -181,11 +181,11 @@ export default function RestaurantsPage() {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure? This will delete the restaurant and ALL associated data!")) return
+        if (!confirm(t('delete_restaurant_confirm'))) return
 
         const { error } = await supabase.from('restaurants').delete().eq('id', id)
         if (error) {
-            alert('Error deleting restaurant: ' + error.message)
+            alert(t('error_deleting_restaurant') + error.message)
         } else {
             fetchRestaurants()
         }
@@ -196,20 +196,20 @@ export default function RestaurantsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">{t('restaurants')}</h2>
-                    <p className="text-muted-foreground">Manage your restaurants platform-wide.</p>
+                    <p className="text-muted-foreground">{t('manage_restaurants_description')}</p>
                 </div>
                 <Button onClick={() => handleOpenDialog()}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Restaurant
+                    <Plus className="mr-2 h-4 w-4" /> {t('add_restaurant')}
                 </Button>
 
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{editingRestaurant ? "Edit Restaurant" : "Add New Restaurant"}</DialogTitle>
+                            <DialogTitle>{editingRestaurant ? t('edit_restaurant') : t('add_new_restaurant')}</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                                <Label htmlFor="name">Restaurant Name</Label>
+                                <Label htmlFor="name">{t('restaurant_name')}</Label>
                                 <Input
                                     id="name"
                                     value={name}
@@ -217,24 +217,24 @@ export default function RestaurantsPage() {
                                         setName(e.target.value)
                                         handleGenerateSlug(e.target.value)
                                     }}
-                                    placeholder="e.g. My Burger Joint"
+                                    placeholder={t('restaurant_name_placeholder')}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="slug">URL Slug</Label>
+                                <Label htmlFor="slug">{t('url_slug')}</Label>
                                 <Input
                                     id="slug"
                                     value={slug}
                                     onChange={(e) => setSlug(e.target.value)}
-                                    placeholder="e.g. my-burger-joint"
+                                    placeholder={t('url_slug_placeholder')}
                                 />
-                                <p className="text-xs text-muted-foreground">This will be used for the menu link: /{slug}</p>
+                                <p className="text-xs text-muted-foreground">{t('slug_help', { slug: slug || 'your-restaurant' })}</p>
                             </div>
 
                             {!editingRestaurant && (
                                 <>
                                     <div className="space-y-2">
-                                        <Label htmlFor="email">Admin Email</Label>
+                                        <Label htmlFor="email">{t('admin_email')}</Label>
                                         <Input
                                             id="email"
                                             type="email"
@@ -244,7 +244,7 @@ export default function RestaurantsPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="password">Admin Password</Label>
+                                        <Label htmlFor="password">{t('admin_password')}</Label>
                                         <Input
                                             id="password"
                                             type="password"
@@ -257,7 +257,7 @@ export default function RestaurantsPage() {
                             )}
 
                             <div className="space-y-2">
-                                <Label>Logo</Label>
+                                <Label>{t('logo')}</Label>
                                 <div className="flex items-center gap-4">
                                     {logoUrl && (
                                         <Avatar className="h-16 w-16">
@@ -275,7 +275,7 @@ export default function RestaurantsPage() {
 
                             <Button onClick={handleSave} disabled={saving} className="w-full">
                                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {editingRestaurant ? "Save Changes" : "Create Restaurant"}
+                                {editingRestaurant ? t('save_changes') : t('create_restaurant')}
                             </Button>
                         </div>
                     </DialogContent>
@@ -286,24 +286,24 @@ export default function RestaurantsPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Logo</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Slug</TableHead>
-                            <TableHead>Created At</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t('logo')}</TableHead>
+                            <TableHead>{t('restaurant_name')}</TableHead>
+                            <TableHead>{t('url_slug')}</TableHead>
+                            <TableHead>{t('created_at')}</TableHead>
+                            <TableHead className="text-right">{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="h-24 text-center">
-                                    Loading...
+                                    {t('loading')}
                                 </TableCell>
                             </TableRow>
                         ) : restaurants.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="h-24 text-center">
-                                    No restaurants found.
+                                    {t('no_restaurants_found')}
                                 </TableCell>
                             </TableRow>
                         ) : (

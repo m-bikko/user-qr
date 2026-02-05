@@ -1,3 +1,4 @@
+
 export type Json =
     | string
     | number
@@ -6,13 +7,15 @@ export type Json =
     | { [key: string]: Json | undefined }
     | Json[]
 
-export type Database = {
+export interface Database {
     public: {
         Tables: {
             categories: {
                 Row: {
                     created_at: string
                     id: string
+                    is_available: boolean | null
+                    kitchen_id: string | null
                     name_en: string
                     name_kz: string
                     name_ru: string
@@ -22,6 +25,8 @@ export type Database = {
                 Insert: {
                     created_at?: string
                     id?: string
+                    is_available?: boolean | null
+                    kitchen_id?: string | null
                     name_en: string
                     name_kz: string
                     name_ru: string
@@ -31,6 +36,8 @@ export type Database = {
                 Update: {
                     created_at?: string
                     id?: string
+                    is_available?: boolean | null
+                    kitchen_id?: string | null
                     name_en?: string
                     name_kz?: string
                     name_ru?: string
@@ -39,12 +46,64 @@ export type Database = {
                 }
                 Relationships: [
                     {
+                        foreignKeyName: "categories_kitchen_id_fkey"
+                        columns: ["kitchen_id"]
+                        isOneToOne: false
+                        referencedRelation: "kitchens"
+                        referencedColumns: ["id"]
+                    },
+                    {
                         foreignKeyName: "categories_restaurant_id_fkey"
                         columns: ["restaurant_id"]
                         isOneToOne: false
                         referencedRelation: "restaurants"
                         referencedColumns: ["id"]
-                    },
+                    }
+                ]
+            }
+            kitchens: {
+                Row: {
+                    created_at: string
+                    id: string
+                    image_url: string | null
+                    is_available: boolean | null
+                    name_en: string
+                    name_kz: string
+                    name_ru: string
+                    restaurant_id: string
+                    slug: string | null
+                    sort_order: number | null
+                }
+                Insert: {
+                    created_at?: string
+                    id?: string
+                    is_available?: boolean | null
+                    name_en: string
+                    name_kz: string
+                    name_ru: string
+                    restaurant_id: string
+                    slug?: string | null
+                    sort_order?: number | null
+                }
+                Update: {
+                    created_at?: string
+                    id?: string
+                    is_available?: boolean | null
+                    name_en?: string
+                    name_kz?: string
+                    name_ru?: string
+                    restaurant_id?: string
+                    slug?: string | null
+                    sort_order?: number | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "kitchens_restaurant_id_fkey"
+                        columns: ["restaurant_id"]
+                        isOneToOne: false
+                        referencedRelation: "restaurants"
+                        referencedColumns: ["id"]
+                    }
                 ]
             }
             product_recommendations: {
@@ -74,51 +133,52 @@ export type Database = {
                         isOneToOne: false
                         referencedRelation: "products"
                         referencedColumns: ["id"]
-                    },
+                    }
                 ]
             }
             products: {
                 Row: {
-                    category_id: string
+                    category_id: string | null
                     created_at: string
                     description_en: string | null
                     description_kz: string | null
                     description_ru: string | null
                     id: string
                     image_url: string | null
-                    is_available: boolean
+                    is_available: boolean | null
                     name_en: string
                     name_kz: string
                     name_ru: string
                     options: Json | null
                     price: number
                     restaurant_id: string | null
+                    sort_order: number
                 }
                 Insert: {
-                    category_id: string
+                    category_id?: string | null
                     created_at?: string
                     description_en?: string | null
                     description_kz?: string | null
                     description_ru?: string | null
                     id?: string
                     image_url?: string | null
-                    is_available?: boolean
+                    is_available?: boolean | null
                     name_en: string
                     name_kz: string
                     name_ru: string
                     options?: Json | null
-                    price: number
+                    price?: number
                     restaurant_id?: string | null
                 }
                 Update: {
-                    category_id?: string
+                    category_id?: string | null
                     created_at?: string
                     description_en?: string | null
                     description_kz?: string | null
                     description_ru?: string | null
                     id?: string
                     image_url?: string | null
-                    is_available?: boolean
+                    is_available?: boolean | null
                     name_en?: string
                     name_kz?: string
                     name_ru?: string
@@ -140,7 +200,7 @@ export type Database = {
                         isOneToOne: false
                         referencedRelation: "restaurants"
                         referencedColumns: ["id"]
-                    },
+                    }
                 ]
             }
             profiles: {
@@ -149,30 +209,37 @@ export type Database = {
                     email: string | null
                     id: string
                     restaurant_id: string | null
-                    role: Database["public"]["Enums"]["app_role"]
+                    role: string
                 }
                 Insert: {
                     created_at?: string
                     email?: string | null
                     id: string
                     restaurant_id?: string | null
-                    role?: Database["public"]["Enums"]["app_role"]
+                    role?: string
                 }
                 Update: {
                     created_at?: string
                     email?: string | null
                     id?: string
                     restaurant_id?: string | null
-                    role?: Database["public"]["Enums"]["app_role"]
+                    role?: string
                 }
                 Relationships: [
+                    {
+                        foreignKeyName: "profiles_id_fkey"
+                        columns: ["id"]
+                        isOneToOne: true
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    },
                     {
                         foreignKeyName: "profiles_restaurant_id_fkey"
                         columns: ["restaurant_id"]
                         isOneToOne: false
                         referencedRelation: "restaurants"
                         referencedColumns: ["id"]
-                    },
+                    }
                 ]
             }
             restaurants: {
@@ -214,92 +281,10 @@ export type Database = {
             }
         }
         Enums: {
-            app_role: "super_admin" | "restaurant_admin"
+            [_ in never]: never
         }
         CompositeTypes: {
             [_ in never]: never
         }
     }
 }
-
-type PublicSchema = Database[Extract<keyof Database, "public">]
-
-export type Tables<
-    PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-    | { schema: keyof Database },
-    TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-    ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-            Row: infer R
-        }
-    ? R
-    : never
-    : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-            Row: infer R
-        }
-    ? R
-    : never
-    : never
-
-export type TablesInsert<
-    PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-    TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-    ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-        Insert: infer I
-    }
-    ? I
-    : never
-    : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Insert: infer I
-    }
-    ? I
-    : never
-    : never
-
-export type TablesUpdate<
-    PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
-    TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-    ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-        Update: infer U
-    }
-    ? U
-    : never
-    : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
-    }
-    ? U
-    : never
-    : never
-
-export type Enums<
-    PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
-    | { schema: keyof Database },
-    EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-    : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-    : never
