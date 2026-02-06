@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -55,6 +56,7 @@ export function UserClient() {
     // Form State
     const [role, setRole] = useState<'super_admin' | 'restaurant_admin'>('restaurant_admin')
     const [restaurantId, setRestaurantId] = useState<string>("none")
+    const [newPassword, setNewPassword] = useState("")
 
     const fetchData = async () => {
         setLoading(true)
@@ -76,6 +78,7 @@ export function UserClient() {
         setEditingProfile(profile)
         setRole(profile.role)
         setRestaurantId(profile.restaurant_id || "none")
+        setNewPassword("") // Reset password field
         setIsDialogOpen(true)
     }
 
@@ -83,6 +86,8 @@ export function UserClient() {
         if (!editingProfile) return
 
         setSaving(true)
+
+        // 1. Update Profile Role/Restaurant
         const updates = {
             role,
             restaurant_id: restaurantId === "none" ? null : restaurantId
@@ -95,10 +100,26 @@ export function UserClient() {
 
         if (error) {
             alert("Error updating profile: " + error.message)
-        } else {
-            setIsDialogOpen(false)
-            fetchData()
+            setSaving(false)
+            return
         }
+
+        // 2. Update Password if provided
+        if (newPassword && newPassword.trim() !== "") {
+            // Import dynamically or at top level. 
+            // Since this is a client component, we import the server action.
+            const { updateUserPassword } = await import("@/actions/update-user-password")
+            const result = await updateUserPassword(editingProfile.id, newPassword)
+
+            if (!result.success) {
+                alert("Profile updated, but password update failed: " + result.message)
+            } else {
+                // Password success
+            }
+        }
+
+        setIsDialogOpen(false)
+        fetchData()
         setSaving(false)
     }
 
@@ -113,11 +134,11 @@ export function UserClient() {
                 <Table className="min-w-[600px]">
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Restaurant</TableHead>
-                            <TableHead>Joined</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t('email')}</TableHead>
+                            <TableHead>{t('role')}</TableHead>
+                            <TableHead>{t('assigned_restaurant')}</TableHead>
+                            <TableHead>{t('joined')}</TableHead>
+                            <TableHead className="text-right">{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -130,7 +151,7 @@ export function UserClient() {
                         ) : profiles.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="h-24 text-center">
-                                    No users found.
+                                    {t('no_users_found')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -139,7 +160,7 @@ export function UserClient() {
                                     <TableCell className="font-medium">{profile.email || "N/A"}</TableCell>
                                     <TableCell>
                                         <Badge variant={profile.role === 'super_admin' ? "default" : "secondary"}>
-                                            {profile.role === 'super_admin' ? "Super Admin" : "Manager"}
+                                            {profile.role === 'super_admin' ? t('super_admin') : t('manager')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
@@ -158,7 +179,7 @@ export function UserClient() {
                                     <TableCell className="text-right">
                                         <Button variant="ghost" size="sm" onClick={() => handleEdit(profile)}>
                                             <UserCog className="h-4 w-4 mr-2" />
-                                            Edit
+                                            {t('edit')}
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -171,14 +192,14 @@ export function UserClient() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit User Profile</DialogTitle>
+                        <DialogTitle>{t('edit_user_profile')}</DialogTitle>
                         <DialogDescription>
-                            Assign role and restaurant access for {editingProfile?.email}.
+                            {t('edit_user_description', { email: editingProfile?.email || "N/A" })}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Role</Label>
+                            <Label>{t('role')}</Label>
                             <Select
                                 value={role}
                                 onValueChange={(val: 'super_admin' | 'restaurant_admin') => setRole(val)}
@@ -187,27 +208,27 @@ export function UserClient() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="restaurant_admin">Restaurant Manager</SelectItem>
-                                    <SelectItem value="super_admin">Super Admin</SelectItem>
+                                    <SelectItem value="restaurant_admin">{t('restaurant_manager')}</SelectItem>
+                                    <SelectItem value="super_admin">{t('super_admin')}</SelectItem>
                                 </SelectContent>
                             </Select>
                             <p className="text-xs text-muted-foreground">
-                                Super Admins can manage all restaurants. Managers are restricted to one restaurant.
+                                {t('role_description')}
                             </p>
                         </div>
 
                         {role === 'restaurant_admin' && (
                             <div className="space-y-2">
-                                <Label>Assigned Restaurant</Label>
+                                <Label>{t('assigned_restaurant')}</Label>
                                 <Select
                                     value={restaurantId}
                                     onValueChange={setRestaurantId}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select a restaurant" />
+                                        <SelectValue placeholder={t('select_restaurant_ph')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">No Assignment (Read Only)</SelectItem>
+                                        <SelectItem value="none">{t('no_assignment')}</SelectItem>
                                         {restaurants.map(r => (
                                             <SelectItem key={r.id} value={r.id}>
                                                 {r.name}
@@ -218,9 +239,23 @@ export function UserClient() {
                             </div>
                         )}
 
+                        <div className="space-y-2">
+                            <Label htmlFor="new-password">{t('change_password')}</Label>
+                            <Input
+                                id="new-password"
+                                type="password"
+                                placeholder={t('new_password_placeholder')}
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                {t('password_hint')}
+                            </p>
+                        </div>
+
                         <Button onClick={handleSave} disabled={saving} className="w-full">
                             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save Changes
+                            {t('save_changes')}
                         </Button>
                     </div>
                 </DialogContent>

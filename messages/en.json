@@ -111,6 +111,24 @@
         "no_restaurant_found_cmd": "No restaurant found.",
         "platform_overview": "Platform Overview",
         "standard_plan": "Standard Plan",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "user_management": "User Management",
+        "user_management_description": "Manage user roles and restaurant assignments.",
+        "edit_user_profile": "Edit User Profile",
+        "edit_user_description": "Assign role and restaurant access for {email}.",
+        "role": "Role",
+        "restaurant_manager": "Restaurant Manager",
+        "super_admin": "Super Admin",
+        "role_description": "Super Admins can manage all restaurants. Managers are restricted to one restaurant.",
+        "assigned_restaurant": "Assigned Restaurant",
+        "select_restaurant_ph": "Select a restaurant",
+        "no_assignment": "No Assignment (Read Only)",
+        "change_password": "Change Password",
+        "new_password_placeholder": "Enter new password (optional)",
+        "password_hint": "Leave blank to keep existing password.",
+        "email": "Email",
+        "joined": "Joined",
+        "no_users_found": "No users found.",
+        "manager": "Manager"
     }
 }

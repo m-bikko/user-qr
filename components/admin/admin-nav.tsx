@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Database } from "@/types/supabase"
 import { ChevronsUpDown, Check, Building, LayoutDashboard, Users } from "lucide-react"
 import {
@@ -33,9 +33,13 @@ type Restaurant = {
 }
 
 export function AdminNav({
-    initialRestaurantId
+    initialRestaurantId,
+    profile,
+    initialRestaurants = []
 }: {
     initialRestaurantId?: string
+    profile: Database['public']['Tables']['profiles']['Row'] | null
+    initialRestaurants?: Restaurant[]
 }) {
     const pathname = usePathname()
     const router = useRouter()
@@ -44,47 +48,19 @@ export function AdminNav({
     const locale = params.locale as string || 'en'
     const t = useTranslations('Admin')
 
-    const [profile, setProfile] = useState<Database['public']['Tables']['profiles']['Row'] | null>(null)
-    const [restaurants, setRestaurants] = useState<Restaurant[]>([])
-    // If we are super admin, we use the cookie value (initialRestaurantId).
-    // If we are restaurant_admin, we will set this once we fetch profile.
-    const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | undefined>(initialRestaurantId)
-    const [loading, setLoading] = useState(true)
     const [open, setOpen] = useState(false)
 
-    useEffect(() => {
-        const init = async () => {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-                const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-                setProfile(profileData)
-
-                if (profileData?.role === 'super_admin') {
-                    // Fetch all restaurants for switcher
-                    const { data: restaurantsData } = await supabase.from('restaurants').select('id, name, slug, logo_url').order('name')
-                    if (restaurantsData) setRestaurants(restaurantsData)
-                } else if (profileData?.restaurant_id) {
-                    // Restaurant Admin: Context is fixed
-                    setSelectedRestaurantId(profileData.restaurant_id)
-                    // Fetch my restaurant details for logo
-                    const { data: myRest } = await supabase.from('restaurants').select('id, name, slug, logo_url').eq('id', profileData.restaurant_id).single()
-                    if (myRest) setRestaurants([myRest])
-                }
-            }
-            setLoading(false)
-        }
-        init()
-    }, [])
+    // Use props for initial state, no local loading state needed anymore
+    const selectedRestaurantId = initialRestaurantId || (profile?.restaurant_id ?? undefined)
+    const restaurants = initialRestaurants
 
     const handleRestaurantSelect = async (restaurantId: string) => {
-        setSelectedRestaurantId(restaurantId)
         setOpen(false)
         await setAdminContext(restaurantId)
         router.refresh()
     }
 
     const handleClearContext = async () => {
-        setSelectedRestaurantId(undefined)
         setOpen(false)
         await clearAdminContext()
         router.refresh()
@@ -131,8 +107,6 @@ export function AdminNav({
             show: !!selectedRestaurantId
         },
     ]
-
-    if (loading) return null
 
     return (
         <nav className="flex flex-col gap-2">

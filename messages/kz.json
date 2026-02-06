@@ -111,6 +111,24 @@
         "no_restaurant_found_cmd": "Мейрамхана табылмады.",
         "platform_overview": "Платформаға шолу",
         "standard_plan": "Стандартты жоспар",
-        "cancel": "Болдырмау"
+        "cancel": "Болдырмау",
+        "user_management": "Пайдаланушыларды басқару",
+        "user_management_description": "Пайдаланушы рөлдерін және мейрамхана тағайындауларын басқару.",
+        "edit_user_profile": "Профильді өңдеу",
+        "edit_user_description": "{email} үшін рөл мен мейрамханаға қолжетімділікті тағайындаңыз.",
+        "role": "Рөл",
+        "restaurant_manager": "Мейрамхана менеджері",
+        "super_admin": "Супер Админ",
+        "role_description": "Супер Админ барлық мейрамханаларды басқара алады. Менеджерлер бір мейрамханамен шектеледі.",
+        "assigned_restaurant": "Тағайындалған мейрамхана",
+        "select_restaurant_ph": "Мейрамхананы таңдаңыз",
+        "no_assignment": "Тағайындалмаған (Тек оқу)",
+        "change_password": "Құпия сөзді өзгерту",
+        "new_password_placeholder": "Жаңа құпия сөзді енгізіңіз (міндетті емес)",
+        "password_hint": "Ағымдағы құпия сөзді сақтау үшін бос қалдырыңыз.",
+        "email": "Email",
+        "joined": "Қосылды",
+        "no_users_found": "Пайдаланушылар табылмады.",
+        "manager": "Менеджер"
     }
 }

@@ -111,6 +111,24 @@
         "no_restaurant_found_cmd": "Ресторан не найден.",
         "platform_overview": "Обзор платформы",
         "standard_plan": "Стандартный план",
-        "cancel": "Отмена"
+        "cancel": "Отмена",
+        "user_management": "Управление пользователями",
+        "user_management_description": "Управление ролями и доступом к ресторанам.",
+        "edit_user_profile": "Редактировать профиль",
+        "edit_user_description": "Назначьте роль и доступ к ресторану для {email}.",
+        "role": "Роль",
+        "restaurant_manager": "Менеджер ресторана",
+        "super_admin": "Супер Админ",
+        "role_description": "Супер Админы управляют всеми ресторанами. Менеджеры ограничены одним рестораном.",
+        "assigned_restaurant": "Назначенный ресторан",
+        "select_restaurant_ph": "Выберите ресторан",
+        "no_assignment": "Без назначения (Только чтение)",
+        "change_password": "Сменить пароль",
+        "new_password_placeholder": "Введите новый пароль (необязательно)",
+        "password_hint": "Оставьте пустым, чтобы оставить текущий пароль.",
+        "email": "Email",
+        "joined": "Присоединился",
+        "no_users_found": "Пользователи не найдены.",
+        "manager": "Менеджер"
     }
 }
