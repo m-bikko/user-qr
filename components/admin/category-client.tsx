@@ -365,8 +365,8 @@ export function CategoryClient({ initialCategories, restaurantId, kitchens }: { 
                                         {kitchen.name_ru && ` / ${kitchen.name_ru}`}
                                     </span>
                                 </h3>
-                                <div className="rounded-md border">
-                                    <Table>
+                                <div className="rounded-md border overflow-x-auto">
+                                    <Table className="min-w-[600px]">
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead className="w-[50px]"></TableHead>
@@ -408,8 +408,8 @@ export function CategoryClient({ initialCategories, restaurantId, kitchens }: { 
                             <h3 className="text-xl font-bold text-destructive flex items-center gap-2">
                                 Unassigned
                             </h3>
-                            <div className="rounded-md border border-destructive/50">
-                                <Table>
+                            <div className="rounded-md border border-destructive/50 overflow-x-auto">
+                                <Table className="min-w-[600px]">
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>{t('name_en')}</TableHead>

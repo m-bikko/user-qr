@@ -109,8 +109,8 @@ export function UserClient() {
 
     return (
         <div className="space-y-4">
-            <div className="rounded-md border">
-                <Table>
+            <div className="rounded-md border overflow-x-auto">
+                <Table className="min-w-[600px]">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Email</TableHead>

@@ -64,9 +64,9 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
     const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${locale}/${restaurant.slug}`;
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">{t('dashboard_title')}</h1>
+        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+            <div className="flex items-center justify-between space-y-2">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t('dashboard_title')}</h1>
                 <Button asChild variant="outline">
                     <Link href={`/${locale}/${restaurant.slug}`} target="_blank">
                         {t('view_public_menu')}
@@ -114,12 +114,12 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                 </Card>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="col-span-1 md:col-span-2 lg:col-span-4">
                     <CardHeader>
                         <CardTitle>{t('quick_actions')}</CardTitle>
                     </CardHeader>
-                    <CardContent className="grid gap-4 md:grid-cols-2">
+                    <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                         <Link href={`/${locale}/admin/products`} className="flex flex-col items-center justify-center p-6 bg-muted/50 hover:bg-muted rounded-lg border transition-colors space-y-2">
                             <Package className="h-8 w-8 text-primary" />
                             <span className="font-medium">{t('manage_products')}</span>
@@ -135,13 +135,15 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     </CardContent>
                 </Card>
 
-                <QrCodeCard
-                    publicUrl={publicUrl}
-                    restaurantName={restaurant.name}
-                    logoUrl={restaurant.logo_url}
-                    testLinkText={t('test_link')}
-                    title={t('menu_qr_code')}
-                />
+                <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                    <QrCodeCard
+                        publicUrl={publicUrl}
+                        restaurantName={restaurant.name}
+                        logoUrl={restaurant.logo_url}
+                        testLinkText={t('test_link')}
+                        title={t('menu_qr_code')}
+                    />
+                </div>
             </div>
         </div>
     );

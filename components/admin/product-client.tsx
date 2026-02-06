@@ -417,7 +417,7 @@ export function ProductClient({
                         <DialogTrigger asChild>
                             <Button onClick={handleAddNew}>{t('add_product')}</Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[85vh] overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle>{editingProduct ? t('edit_product') : t('add_product')}</DialogTitle>
                             </DialogHeader>
@@ -633,90 +633,94 @@ export function ProductClient({
 
                 {/* Categories Loop */}
                 <div className="space-y-8">
-                    {categories.map((category) => {
-                        const categoryProducts = products
-                            .filter(p => p.category_id === category.id)
-                            .sort((a, b) => a.sort_order - b.sort_order)
+                    {
+                        categories.map((category) => {
+                            const categoryProducts = products
+                                .filter(p => p.category_id === category.id)
+                                .sort((a, b) => a.sort_order - b.sort_order)
 
-                        // Dynamic key access for localized name
-                        const categoryName = category[`name_${locale}` as keyof typeof category] as string || category.name_en
-                        const kitchen = kitchens.find(k => k.id === category.kitchen_id)
-                        const kitchenName = kitchen ? (kitchen[`name_${locale}` as keyof typeof kitchen] as string || kitchen.name_en) : ''
+                            // Dynamic key access for localized name
+                            const categoryName = category[`name_${locale}` as keyof typeof category] as string || category.name_en
+                            const kitchen = kitchens.find(k => k.id === category.kitchen_id)
+                            const kitchenName = kitchen ? (kitchen[`name_${locale}` as keyof typeof kitchen] as string || kitchen.name_en) : ''
 
-                        return (
-                            <div key={category.id} className="space-y-4">
-                                <h3 className="text-xl font-bold flex items-center gap-2">
-                                    {kitchenName && <span className="text-muted-foreground font-medium">{kitchenName} &mdash;</span>}
-                                    {categoryName}
-                                    <span className="text-sm font-normal text-muted-foreground">({categoryProducts.length})</span>
-                                </h3>
-                                <div className="rounded-md border">
-                                    <Table>
+                            return (
+                                <div key={category.id} className="space-y-4">
+                                    <h3 className="text-xl font-bold flex items-center gap-2">
+                                        {kitchenName && <span className="text-muted-foreground font-medium">{kitchenName} &mdash;</span>}
+                                        {categoryName}
+                                        <span className="text-sm font-normal text-muted-foreground">({categoryProducts.length})</span>
+                                    </h3>
+                                    <div className="rounded-md border overflow-x-auto">
+                                        <Table className="min-w-[600px]">
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[50px]"></TableHead>
+                                                    <TableHead>{t('name_en')}</TableHead>
+                                                    <TableHead>{t('price')}</TableHead>
+                                                    <TableHead className="text-right">{t('actions')}</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <SortableContext items={categoryProducts.map(p => p.id)} strategy={verticalListSortingStrategy}>
+                                                    {categoryProducts.map((product) => (
+                                                        <SortableRow
+                                                            key={product.id}
+                                                            product={product}
+                                                            onEdit={handleEdit}
+                                                            onDelete={deleteProduct}
+                                                            locale={locale}
+                                                        />
+                                                    ))}
+                                                </SortableContext>
+                                                {categoryProducts.length === 0 && (
+                                                    <TableRow>
+                                                        <TableCell colSpan={4} className="h-16 text-center text-muted-foreground text-sm">
+                                                            {t('no_products_in_category')}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+
+                    {/* Uncategorized Products (if any) */}
+                    {
+                        products.filter(p => !p.category_id).length > 0 && (
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold text-muted-foreground">{t('uncategorized', { defaultMessage: 'Uncategorized' })}</h3>
+                                <div className="rounded-md border overflow-x-auto">
+                                    <Table className="min-w-[600px]">
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead className="w-[50px]"></TableHead>
                                                 <TableHead>{t('name_en')}</TableHead>
                                                 <TableHead>{t('price')}</TableHead>
                                                 <TableHead className="text-right">{t('actions')}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            <SortableContext items={categoryProducts.map(p => p.id)} strategy={verticalListSortingStrategy}>
-                                                {categoryProducts.map((product) => (
-                                                    <SortableRow
-                                                        key={product.id}
-                                                        product={product}
-                                                        onEdit={handleEdit}
-                                                        onDelete={deleteProduct}
-                                                        locale={locale}
-                                                    />
-                                                ))}
-                                            </SortableContext>
-                                            {categoryProducts.length === 0 && (
-                                                <TableRow>
-                                                    <TableCell colSpan={4} className="h-16 text-center text-muted-foreground text-sm">
-                                                        {t('no_products_in_category')}
+                                            {products.filter(p => !p.category_id).map((product) => (
+                                                <TableRow key={product.id}>
+                                                    <TableCell className="font-medium">{product.name_en}</TableCell>
+                                                    <TableCell>{product.price}</TableCell>
+                                                    <TableCell className="text-right space-x-2">
+                                                        <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>{t('edit')}</Button>
+                                                        <Button variant="destructive" size="sm" onClick={() => deleteProduct(product.id)}>{t('delete')}</Button>
                                                     </TableCell>
                                                 </TableRow>
-                                            )}
+                                            ))}
                                         </TableBody>
                                     </Table>
                                 </div>
                             </div>
                         )
-                    })}
-
-                    {/* Uncategorized Products (if any) */}
-                    {products.filter(p => !p.category_id).length > 0 && (
-                        <div className="space-y-4">
-                            <h3 className="text-xl font-bold text-muted-foreground">{t('uncategorized', { defaultMessage: 'Uncategorized' })}</h3>
-                            <div className="rounded-md border">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>{t('name_en')}</TableHead>
-                                            <TableHead>{t('price')}</TableHead>
-                                            <TableHead className="text-right">{t('actions')}</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {products.filter(p => !p.category_id).map((product) => (
-                                            <TableRow key={product.id}>
-                                                <TableCell className="font-medium">{product.name_en}</TableCell>
-                                                <TableCell>{product.price}</TableCell>
-                                                <TableCell className="text-right space-x-2">
-                                                    <Button variant="outline" size="sm" onClick={() => handleEdit(product)}>{t('edit')}</Button>
-                                                    <Button variant="destructive" size="sm" onClick={() => deleteProduct(product.id)}>{t('delete')}</Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </DndContext>
+                    }
+                </div >
+            </div >
+        </DndContext >
     )
 }

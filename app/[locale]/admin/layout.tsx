@@ -31,7 +31,7 @@ export default async function AdminLayout({
                                 </SheetTrigger>
                                 <SheetContent side="left" className="w-[240px] sm:w-[300px]">
                                     <SheetTitle className="sr-only">Menu</SheetTitle>
-                                    <div className="px-1 py-6">
+                                    <div className="px-6 py-6">
                                         <AdminNav initialRestaurantId={contextRestaurantId?.value} />
                                     </div>
                                 </SheetContent>

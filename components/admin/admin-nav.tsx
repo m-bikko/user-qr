@@ -137,7 +137,7 @@ export function AdminNav({
     return (
         <nav className="flex flex-col gap-2">
             <div className="px-2 mb-4 flex flex-col gap-3">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('menu_title')}</span>
                     {profile?.role === 'super_admin' && <span className="text-[10px] bg-primary/20 text-primary px-1 rounded">SUPER</span>}
                 </div>
