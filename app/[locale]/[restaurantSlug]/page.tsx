@@ -12,7 +12,7 @@ export default async function MenuPage({
     // Fetch restaurant
     const { data: restaurant } = await supabase
         .from('restaurants')
-        .select('id, name, logo_url, theme, telegram_chat_id, primary_color')
+        .select('id, name, logo_url, theme, telegram_chat_id, primary_color, background_color')
         .eq('slug', restaurantSlug)
         .single()
 
@@ -40,7 +40,7 @@ export default async function MenuPage({
         .order('sort_order', { ascending: true })
 
     return (
-        <div className="bg-zinc-50 dark:bg-zinc-950 min-h-screen">
+        <div className="min-h-screen" style={{ backgroundColor: restaurant.background_color || undefined }}>
             <MenuClient
                 categories={categories || []}
                 kitchens={kitchens || []}
@@ -51,6 +51,7 @@ export default async function MenuPage({
                 theme={restaurant.theme || 'default'}
                 telegramChatId={restaurant.telegram_chat_id}
                 primaryColor={restaurant.primary_color || '#000000'}
+                backgroundColor={restaurant.background_color || '#ffffff'}
             />
         </div>
     )

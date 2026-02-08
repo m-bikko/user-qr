@@ -4,6 +4,16 @@ import { createClient } from "@/lib/supabase-server"
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 
+// Helper to escape HTML characters for Telegram
+function escapeHtml(unsafe: string) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 export async function sendFeedbackAction(formData: FormData) {
     if (!TELEGRAM_BOT_TOKEN) {
         return { success: false, error: "Bot not configured" }
@@ -11,6 +21,7 @@ export async function sendFeedbackAction(formData: FormData) {
 
     const restaurantId = formData.get('restaurantId') as string
     const comment = formData.get('comment') as string
+    const rating = formData.get('rating') as string || 'N/A' // Handle potential legacy calls
 
     // Extract photos
     const photos: File[] = []
@@ -41,10 +52,13 @@ export async function sendFeedbackAction(formData: FormData) {
         const chatId = restaurant.telegram_chat_id
         const restaurantName = restaurant.name
 
-        // Construct the caption/message
-        // Using simple bolding compatible with 'Markdown' or just plain text to avoid parse errors
-        const header = `📨 *New Feedback for ${restaurantName}*`
-        const fullCaption = comment ? `${header}\n\n${comment}` : header
+        // Construct the caption/message using HTML
+        // const header = `📨 <b>New Feedback for ${escapeHtml(restaurantName)}</b>`
+        let fullCaption = `<b>Рейтинг пользователя:</b> ${rating}/5⭐`
+
+        if (comment) {
+            fullCaption += `\n<b>Отзыв пользователя:</b>\n<blockquote>${escapeHtml(comment)}</blockquote>`
+        }
 
         // 2. Send based on photo count
         if (photos.length === 0) {
@@ -76,7 +90,7 @@ async function sendTelegramMessage(chatId: string, text: string) {
         body: JSON.stringify({
             chat_id: chatId,
             text: text,
-            parse_mode: 'Markdown', // Legacy Markdown
+            parse_mode: 'HTML',
         }),
     })
 
@@ -92,7 +106,7 @@ async function sendTelegramPhoto(chatId: string, photo: File, caption: string) {
     formData.append('chat_id', chatId)
     formData.append('photo', photo)
     formData.append('caption', caption)
-    formData.append('parse_mode', 'Markdown')
+    formData.append('parse_mode', 'HTML')
 
     const res = await fetch(url, {
         method: 'POST',
@@ -114,7 +128,7 @@ async function sendTelegramMediaGroup(chatId: string, photos: File[], caption: s
         type: 'photo',
         media: `attach://photo_${index}`,
         caption: index === 0 ? caption : '', // Caption only on the first item
-        parse_mode: 'Markdown'
+        parse_mode: 'HTML'
     }))
 
     formData.append('media', JSON.stringify(media))

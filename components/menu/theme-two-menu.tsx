@@ -47,7 +47,8 @@ export function ThemeTwoMenu({
     restaurantName,
     restaurantLogo,
     telegramChatId,
-    primaryColor
+    primaryColor,
+    backgroundColor
 }: {
     categories: Category[],
     kitchens: Kitchen[],
@@ -56,7 +57,8 @@ export function ThemeTwoMenu({
     restaurantName: string,
     restaurantLogo: string | null,
     telegramChatId?: string | null,
-    primaryColor: string
+    primaryColor: string,
+    backgroundColor: string
 }) {
     const t = useTranslations('Index')
     const router = useRouter()
@@ -67,7 +69,9 @@ export function ThemeTwoMenu({
 
     // Calculate dynamic styles
     const safeColor = isValidHex(primaryColor) ? primaryColor : '#000000'
+    const safeBackgroundColor = isValidHex(backgroundColor) ? backgroundColor : '#ffffff'
     const foregroundColor = getContrastColor(safeColor)
+    const backgroundForeground = getContrastColor(safeBackgroundColor)
 
     // CSS variables to inject
     const dynamicStyle = {
@@ -75,6 +79,8 @@ export function ThemeTwoMenu({
         "--primary": safeColor,
         "--primary-foreground": foregroundColor,
         "--ring": safeColor,
+        "--background": safeBackgroundColor,
+        "--foreground": backgroundForeground === '#ffffff' ? '#ffffff' : '#000000',
     } as React.CSSProperties
 
     useEffect(() => {

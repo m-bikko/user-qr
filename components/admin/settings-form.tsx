@@ -20,16 +20,19 @@ export function AdminSettingsForm({
     restaurantId,
     initialChatId,
     initialTheme,
-    initialColor
+    initialColor,
+    initialBackgroundColor
 }: {
     restaurantId: string,
     initialChatId: string,
     initialTheme: string,
-    initialColor?: string
+    initialColor?: string,
+    initialBackgroundColor?: string
 }) {
     const t = useTranslations('Admin')
     const [chatId, setChatId] = useState(initialChatId)
     const [primaryColor, setPrimaryColor] = useState(initialColor || '#000000')
+    const [backgroundColor, setBackgroundColor] = useState(initialBackgroundColor || '#ffffff')
     const [loading, setLoading] = useState(false)
     const [loadingColor, setLoadingColor] = useState(false)
 
@@ -43,7 +46,10 @@ export function AdminSettingsForm({
 
     const handleSaveColor = async () => {
         setLoadingColor(true)
-        const result = await updateRestaurantSettingsAction(restaurantId, { primary_color: primaryColor })
+        const result = await updateRestaurantSettingsAction(restaurantId, {
+            primary_color: primaryColor,
+            background_color: backgroundColor
+        })
         if (result.error) alert(result.error)
         else alert(result.message)
         setLoadingColor(false)
@@ -112,6 +118,24 @@ export function AdminSettingsForm({
                                 onChange={(e) => setPrimaryColor(e.target.value)}
                                 className="w-32"
                                 placeholder="#000000"
+                            />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="backgroundColor">{t('background_color')}</Label>
+                        <div className="flex items-center gap-3">
+                            <Input
+                                id="backgroundColor"
+                                type="color"
+                                value={backgroundColor}
+                                onChange={(e) => setBackgroundColor(e.target.value)}
+                                className="w-12 h-12 p-1 cursor-pointer"
+                            />
+                            <Input
+                                value={backgroundColor}
+                                onChange={(e) => setBackgroundColor(e.target.value)}
+                                className="w-32"
+                                placeholder="#ffffff"
                             />
                         </div>
                     </div>

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { MessageSquare, Image as ImageIcon, X, Loader2, Send } from "lucide-react"
+import { MessageSquare, Image as ImageIcon, X, Loader2, Send, Star } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { sendFeedbackAction } from "@/actions/send-feedback" // Server Action
 import Image from "next/image"
@@ -22,6 +22,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
     const t = useTranslations('Index') // Assuming general translations
     const [open, setOpen] = useState(false)
     const [comment, setComment] = useState("")
+    const [rating, setRating] = useState(5)
     const [photos, setPhotos] = useState<File[]>([])
     const [previews, setPreviews] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
@@ -69,6 +70,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
         const formData = new FormData()
         formData.append('restaurantId', restaurantId)
         formData.append('comment', comment)
+        formData.append('rating', rating.toString())
         photos.forEach((photo, index) => {
             formData.append(`photo_${index}`, photo)
         })
@@ -79,6 +81,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
         if (result.success) {
             setOpen(false)
             setComment("")
+            setRating(5)
             setPhotos([])
             alert(t('feedback_sent'))
         } else {
@@ -104,6 +107,25 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                         </DialogHeader>
 
                         <div className="space-y-4 py-4">
+                            <div className="flex justify-center mb-2">
+                                <div className="flex gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => setRating(star)}
+                                            className="p-1 transition-transform active:scale-95 focus:outline-none"
+                                        >
+                                            <Star
+                                                className={`w-8 h-8 transition-colors ${star <= rating
+                                                    ? "fill-yellow-400 text-yellow-400"
+                                                    : "text-muted-foreground/30"
+                                                    }`}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <div className="space-y-2">
                                 <Label>{t('your_comment')} (Max 300 chars)</Label>
                                 <Textarea

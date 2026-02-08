@@ -27,21 +27,18 @@ export default async function RestaurantLayout({
 
     const { data: restaurant } = await supabase
         .from('restaurants')
-        .select('primary_color')
+        .select('primary_color, background_color')
         .eq('slug', restaurantSlug)
         .single()
 
     // Default or fetched color
     const primaryColor = restaurant?.primary_color || '#000000'
+    const backgroundColor = restaurant?.background_color || '#ffffff'
 
-    // Ensure it's a valid hex before processing, fallback to black if not
+    // Ensure it's a valid hex before processing, fallback to black/white if not
     const safeColor = isValidHex(primaryColor) ? primaryColor : '#000000'
+    const safeBackgroundColor = isValidHex(backgroundColor) ? backgroundColor : '#ffffff'
     const foregroundColor = getContrastColor(safeColor)
-
-    // We can inject styles via a style tag or inline styles on a wrapper. 
-    // A style tag is cleaner for overriding globally within this subtree.
-    // However, React style tags need to be handled carefully or just use a wrapper div with CSS vars.
-    // Using a wrapper div is React-idiomatic.
 
     return (
         <div
@@ -49,12 +46,17 @@ export default async function RestaurantLayout({
                 // @ts-ignore
                 "--primary": safeColor,
                 "--primary-foreground": foregroundColor,
-                // We might need to override ring/border too if requested, but let's start with primary
                 "--ring": safeColor,
+                // Override background if custom color is set
+                "--background": safeBackgroundColor,
+                // Ensure text is readable on custom background (simple check)
+                "--foreground": getContrastColor(safeBackgroundColor) === '#ffffff' ? '#ffffff' : '#000000',
             } as React.CSSProperties}
-            className="contents" // "contents" makes the div phantom in the DOM tree layout-wise
+            className="contents"
         >
-            {children}
+            <div className={`min-h-screen bg-[var(--background)] text-[var(--foreground)]`}>
+                {children}
+            </div>
         </div>
     )
 }

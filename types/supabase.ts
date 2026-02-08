@@ -212,6 +212,7 @@ export interface Database {
                     theme: string | null
                     telegram_chat_id: string | null
                     primary_color: string | null
+                    background_color: string | null
                 }
                 Insert: {
                     created_at?: string
@@ -222,6 +223,7 @@ export interface Database {
                     theme?: string | null
                     telegram_chat_id?: string | null
                     primary_color?: string | null
+                    background_color?: string | null
                 }
                 Update: {
                     created_at?: string
@@ -232,6 +234,7 @@ export interface Database {
                     theme?: string | null
                     telegram_chat_id?: string | null
                     primary_color?: string | null
+                    background_color?: string | null
                 }
                 Relationships: []
             }

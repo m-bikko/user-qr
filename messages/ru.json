@@ -155,6 +155,7 @@
         "appearance_config_title": "Настройка внешнего вида",
         "appearance_config_desc": "Настройте цвета и брендинг.",
         "primary_color": "Основной цвет",
+        "background_color": "Цвет фона",
         "save_details": "Сохранить детали"
     }
 }

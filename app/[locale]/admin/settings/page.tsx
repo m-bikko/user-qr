@@ -51,6 +51,7 @@ export default async function SettingsPage(props: Props) {
                     initialChatId={restaurant.telegram_chat_id || ''}
                     initialTheme={restaurant.theme || 'default'}
                     initialColor={restaurant.primary_color || '#000000'}
+                    initialBackgroundColor={restaurant.background_color || '#ffffff'}
                 />
             </div>
         </div>
