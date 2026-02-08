@@ -150,7 +150,11 @@
         "telegram_chat_id": "Telegram Chat ID",
         "telegram_instruction_1": "1. <link>@userinfobot</link> ашыңыз.",
         "telegram_instruction_2": "2. /start басыңыз.",
-        "telegram_instruction_3": "3. Келген ID нөмірін көшіріп, осында қойыңыз.",
-        "telegram_instruction_4": "4. Хабарлама алу үшін <link>@userQRFeedbackBot</link>-та /start басыңыз."
+        "telegram_instruction_3": "3. Келген ID нөмірін көшіріп, осыған қойыңыз.",
+        "telegram_instruction_4": "4. Хабарламаларды алу үшін <link>@userQRFeedbackBot</link> ботында /start басыңыз.",
+        "appearance_config_title": "Сыртқы көріністі баптау",
+        "appearance_config_desc": "Түстер мен брендті баптаңыз.",
+        "primary_color": "Негізгі түс",
+        "save_details": "Мәліметтерді сақтау"
     }
 }

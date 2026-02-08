@@ -211,6 +211,7 @@ export interface Database {
                     slug: string
                     theme: string | null
                     telegram_chat_id: string | null
+                    primary_color: string | null
                 }
                 Insert: {
                     created_at?: string
@@ -220,6 +221,7 @@ export interface Database {
                     slug: string
                     theme?: string | null
                     telegram_chat_id?: string | null
+                    primary_color?: string | null
                 }
                 Update: {
                     created_at?: string
@@ -229,6 +231,7 @@ export interface Database {
                     slug?: string
                     theme?: string | null
                     telegram_chat_id?: string | null
+                    primary_color?: string | null
                 }
                 Relationships: []
             }

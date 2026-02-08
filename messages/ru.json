@@ -151,6 +151,10 @@
         "telegram_instruction_1": "1. Откройте <link>@userinfobot</link>.",
         "telegram_instruction_2": "2. Нажмите /start.",
         "telegram_instruction_3": "3. Скопируйте полученный ID и вставьте его сюда.",
-        "telegram_instruction_4": "4. Нажмите /start в <link>@userQRFeedbackBot</link>, чтобы разрешить сообщения."
+        "telegram_instruction_4": "4. Нажмите /start в <link>@userQRFeedbackBot</link>, чтобы разрешить сообщения.",
+        "appearance_config_title": "Настройка внешнего вида",
+        "appearance_config_desc": "Настройте цвета и брендинг.",
+        "primary_color": "Основной цвет",
+        "save_details": "Сохранить детали"
     }
 }

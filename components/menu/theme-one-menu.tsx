@@ -25,6 +25,20 @@ type Product = Database['public']['Tables']['products']['Row']
 type Category = Database['public']['Tables']['categories']['Row']
 type Kitchen = Database['public']['Tables']['kitchens']['Row']
 
+// Helper for hex validation
+function isValidHex(hex: string) {
+    return /^#[0-9A-F]{6}$/i.test(hex)
+}
+
+// Helper for contrast
+function getContrastColor(hex: string) {
+    const r = parseInt(hex.substr(1, 2), 16)
+    const g = parseInt(hex.substr(3, 2), 16)
+    const b = parseInt(hex.substr(5, 2), 16)
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
+    return yiq >= 128 ? '#000000' : '#ffffff'
+}
+
 export function ThemeOneMenu({
     categories,
     kitchens,
@@ -32,7 +46,8 @@ export function ThemeOneMenu({
     restaurantSlug,
     restaurantName,
     restaurantLogo,
-    telegramChatId
+    telegramChatId,
+    primaryColor
 }: {
     categories: Category[],
     kitchens: Kitchen[],
@@ -40,7 +55,8 @@ export function ThemeOneMenu({
     restaurantSlug: string,
     restaurantName: string,
     restaurantLogo: string | null,
-    telegramChatId?: string | null
+    telegramChatId?: string | null,
+    primaryColor: string
 }) {
     const t = useTranslations('Index')
     const router = useRouter()
@@ -48,6 +64,18 @@ export function ThemeOneMenu({
     const { items, addItem, updateQuantity, removeItem, totalPrice } = useCartStore()
     const [isMounted, setIsMounted] = useState(false)
     const [selectedKitchenId, setSelectedKitchenId] = useState<string | null>(null)
+
+    // Calculate dynamic styles
+    const safeColor = isValidHex(primaryColor) ? primaryColor : '#000000'
+    const foregroundColor = getContrastColor(safeColor)
+
+    // CSS variables to inject
+    const dynamicStyle = {
+        // @ts-ignore
+        "--primary": safeColor,
+        "--primary-foreground": foregroundColor,
+        "--ring": safeColor,
+    } as React.CSSProperties
 
     useEffect(() => {
         setIsMounted(true)
@@ -317,7 +345,7 @@ export function ThemeOneMenu({
                 <div className="fixed bottom-6 left-0 right-0 px-4 z-50 flex justify-center pointer-events-none">
                     <Sheet>
                         <SheetTrigger asChild>
-                            <Button className="pointer-events-auto w-full max-w-md h-14 shadow-2xl text-lg flex justify-between items-center px-6 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all transform hover:scale-[1.02]">
+                            <Button className="pointer-events-auto w-full max-w-md h-14 shadow-2xl text-lg flex justify-between items-center px-6 rounded-full transition-all transform hover:scale-[1.02] bg-primary text-primary-foreground hover:bg-primary/90">
                                 <div className="flex items-center gap-3">
                                     <div className="bg-background text-foreground rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold">
                                         {items.reduce((acc, i) => acc + i.quantity, 0)}
@@ -328,77 +356,80 @@ export function ThemeOneMenu({
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="bottom" className="h-[90vh] flex flex-col sm:max-w-md sm:mx-auto rounded-t-2xl">
-                            <SheetHeader className="mb-4 px-6">
-                                <SheetTitle>{t('your_order')}</SheetTitle>
-                            </SheetHeader>
+                            {/* Inject styles here for the portal content */}
+                            <div className="contents" style={dynamicStyle}>
+                                <SheetHeader className="mb-4 px-6">
+                                    <SheetTitle>{t('your_order')}</SheetTitle>
+                                </SheetHeader>
 
-                            {/* Plain Text Cart View */}
-                            <div className="flex-1 overflow-y-auto space-y-4 pb-4">
-                                {items.map(item => (
-                                    <div key={item.id} className="flex items-center gap-4 border-b pb-4 last:border-0 px-6">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="font-medium truncate">{getLocalized(item.product, 'name')}</div>
-                                            {(item.selectedOptions || []).length > 0 && (
-                                                <div className="mt-2 space-y-2">
-                                                    {Object.entries(
-                                                        item.selectedOptions.reduce((acc, option) => {
-                                                            const parts = option.name.split(': ')
-                                                            const group = parts.length > 1 ? parts[0] : 'Other'
-                                                            const name = parts.length > 1 ? parts[1] : parts[0]
+                                {/* Plain Text Cart View */}
+                                <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+                                    {items.map(item => (
+                                        <div key={item.id} className="flex items-center gap-4 border-b pb-4 last:border-0 px-6">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-medium truncate">{getLocalized(item.product, 'name')}</div>
+                                                {(item.selectedOptions || []).length > 0 && (
+                                                    <div className="mt-2 space-y-2">
+                                                        {Object.entries(
+                                                            item.selectedOptions.reduce((acc, option) => {
+                                                                const parts = option.name.split(': ')
+                                                                const group = parts.length > 1 ? parts[0] : 'Other'
+                                                                const name = parts.length > 1 ? parts[1] : parts[0]
 
-                                                            if (!acc[group]) acc[group] = []
-                                                            acc[group].push({ ...option, displayName: name })
-                                                            return acc
-                                                        }, {} as Record<string, any[]>)
-                                                    ).map(([group, options]) => (
-                                                        <div key={group} className="text-xs">
-                                                            {group !== 'Other' && (
-                                                                <div className="font-semibold text-muted-foreground mb-1">{group}</div>
-                                                            )}
-                                                            <div className="space-y-1 pl-2 border-l-2 border-muted">
-                                                                {options.map((o, i) => (
-                                                                    <div key={i} className="text-muted-foreground flex justify-between items-start">
-                                                                        <span className="mr-2">{o.displayName}</span>
-                                                                        {o.price > 0 && <span className="font-medium">+{o.price} ₸</span>}
-                                                                    </div>
-                                                                ))}
+                                                                if (!acc[group]) acc[group] = []
+                                                                acc[group].push({ ...option, displayName: name })
+                                                                return acc
+                                                            }, {} as Record<string, any[]>)
+                                                        ).map(([group, options]) => (
+                                                            <div key={group} className="text-xs">
+                                                                {group !== 'Other' && (
+                                                                    <div className="font-semibold text-muted-foreground mb-1">{group}</div>
+                                                                )}
+                                                                <div className="space-y-1 pl-2 border-l-2 border-muted">
+                                                                    {options.map((o, i) => (
+                                                                        <div key={i} className="text-muted-foreground flex justify-between items-start">
+                                                                            <span className="mr-2">{o.displayName}</span>
+                                                                            {o.price > 0 && <span className="font-medium">+{o.price} ₸</span>}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-3 bg-secondary/50 rounded-lg px-2 py-1 shrink-0">
+                                                <button
+                                                    className="w-8 h-8 flex items-center justify-center text-lg leading-none active:scale-95 transition-transform"
+                                                    onClick={() => {
+                                                        if (item.quantity > 1) updateQuantity(item.id, item.quantity - 1)
+                                                        else removeItem(item.id)
+                                                    }}
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="w-6 text-center font-medium tabular-nums">{item.quantity}</span>
+                                                <button
+                                                    className="w-8 h-8 flex items-center justify-center text-lg leading-none active:scale-95 transition-transform"
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div className="text-right font-medium w-20 shrink-0">
+                                                {(item.product.price + (item.selectedOptions?.reduce((a, b) => a + b.price, 0) || 0)) * item.quantity} ₸
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-3 bg-secondary/50 rounded-lg px-2 py-1 shrink-0">
-                                            <button
-                                                className="w-8 h-8 flex items-center justify-center text-lg leading-none active:scale-95 transition-transform"
-                                                onClick={() => {
-                                                    if (item.quantity > 1) updateQuantity(item.id, item.quantity - 1)
-                                                    else removeItem(item.id)
-                                                }}
-                                            >
-                                                -
-                                            </button>
-                                            <span className="w-6 text-center font-medium tabular-nums">{item.quantity}</span>
-                                            <button
-                                                className="w-8 h-8 flex items-center justify-center text-lg leading-none active:scale-95 transition-transform"
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                        <div className="text-right font-medium w-20 shrink-0">
-                                            {(item.product.price + (item.selectedOptions?.reduce((a, b) => a + b.price, 0) || 0)) * item.quantity} ₸
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t pt-4 pb-12 px-6 space-y-4">
-                                <div className="flex justify-between text-xl font-bold">
-                                    <span>{t('total')}</span>
-                                    <span>{totalPrice()} ₸</span>
+                                    ))}
                                 </div>
-                                <Button className="w-full h-14 text-lg rounded-xl shadow-md">{t('checkout')}</Button>
+
+                                <div className="border-t pt-4 pb-12 px-6 space-y-4">
+                                    <div className="flex justify-between text-xl font-bold">
+                                        <span>{t('total')}</span>
+                                        <span>{totalPrice()} ₸</span>
+                                    </div>
+                                    <Button className="w-full h-14 text-lg rounded-xl shadow-md">{t('checkout')}</Button>
+                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>

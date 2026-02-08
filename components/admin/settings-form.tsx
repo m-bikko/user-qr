@@ -19,26 +19,34 @@ import { useTranslations } from "next-intl"
 export function AdminSettingsForm({
     restaurantId,
     initialChatId,
-    initialTheme
+    initialTheme,
+    initialColor
 }: {
     restaurantId: string,
     initialChatId: string,
-    initialTheme: string
+    initialTheme: string,
+    initialColor?: string
 }) {
     const t = useTranslations('Admin')
     const [chatId, setChatId] = useState(initialChatId)
+    const [primaryColor, setPrimaryColor] = useState(initialColor || '#000000')
     const [loading, setLoading] = useState(false)
+    const [loadingColor, setLoadingColor] = useState(false)
 
     const handleSave = async () => {
         setLoading(true)
         const result = await updateRestaurantSettingsAction(restaurantId, { telegram_chat_id: chatId })
-
-        if (result.error) {
-            alert(result.error)
-        } else {
-            alert(result.message)
-        }
+        if (result.error) alert(result.error)
+        else alert(result.message)
         setLoading(false)
+    }
+
+    const handleSaveColor = async () => {
+        setLoadingColor(true)
+        const result = await updateRestaurantSettingsAction(restaurantId, { primary_color: primaryColor })
+        if (result.error) alert(result.error)
+        else alert(result.message)
+        setLoadingColor(false)
     }
 
     return (
@@ -82,8 +90,40 @@ export function AdminSettingsForm({
                 </CardContent>
             </Card>
 
+            {/* Appearance Settings */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('appearance_config_title')}</CardTitle>
+                    <CardDescription>{t('appearance_config_desc')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="primaryColor">{t('primary_color')}</Label>
+                        <div className="flex items-center gap-3">
+                            <Input
+                                id="primaryColor"
+                                type="color"
+                                value={primaryColor}
+                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                className="w-12 h-12 p-1 cursor-pointer"
+                            />
+                            <Input
+                                value={primaryColor}
+                                onChange={(e) => setPrimaryColor(e.target.value)}
+                                className="w-32"
+                                placeholder="#000000"
+                            />
+                        </div>
+                    </div>
+                    <Button onClick={handleSaveColor} disabled={loadingColor}>
+                        {loadingColor && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {t('save_details')}
+                    </Button>
+                </CardContent>
+            </Card>
+
             {/* Theme Settings - Reusing functionality via ThemeSwitcher or new logic */}
             <ThemeSwitcher restaurantId={restaurantId} initialTheme={initialTheme} />
-        </div>
+        </div >
     )
 }

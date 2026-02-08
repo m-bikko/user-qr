@@ -16,7 +16,8 @@ export function MenuClient({
     restaurantName,
     restaurantLogo,
     theme = 'default',
-    telegramChatId
+    telegramChatId,
+    primaryColor
 }: {
     categories: Category[],
     kitchens: Kitchen[],
@@ -25,7 +26,8 @@ export function MenuClient({
     restaurantName: string,
     restaurantLogo: string | null,
     theme?: string,
-    telegramChatId?: string | null
+    telegramChatId?: string | null,
+    primaryColor: string
 }) {
     if (theme === 'modern') {
         return (
@@ -37,6 +39,7 @@ export function MenuClient({
                 restaurantName={restaurantName}
                 restaurantLogo={restaurantLogo}
                 telegramChatId={telegramChatId}
+                primaryColor={primaryColor}
             />
         )
     }
@@ -51,6 +54,7 @@ export function MenuClient({
             restaurantName={restaurantName}
             restaurantLogo={restaurantLogo}
             telegramChatId={telegramChatId}
+            primaryColor={primaryColor}
         />
     )
 }

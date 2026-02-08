@@ -25,6 +25,20 @@ type Product = Database['public']['Tables']['products']['Row']
 type Category = Database['public']['Tables']['categories']['Row']
 type Kitchen = Database['public']['Tables']['kitchens']['Row']
 
+// Helper for hex validation
+function isValidHex(hex: string) {
+    return /^#[0-9A-F]{6}$/i.test(hex)
+}
+
+// Helper for contrast
+function getContrastColor(hex: string) {
+    const r = parseInt(hex.substr(1, 2), 16)
+    const g = parseInt(hex.substr(3, 2), 16)
+    const b = parseInt(hex.substr(5, 2), 16)
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
+    return yiq >= 128 ? '#000000' : '#ffffff'
+}
+
 export function ThemeTwoMenu({
     categories,
     kitchens,
@@ -32,7 +46,8 @@ export function ThemeTwoMenu({
     restaurantSlug,
     restaurantName,
     restaurantLogo,
-    telegramChatId
+    telegramChatId,
+    primaryColor
 }: {
     categories: Category[],
     kitchens: Kitchen[],
@@ -40,7 +55,8 @@ export function ThemeTwoMenu({
     restaurantSlug: string,
     restaurantName: string,
     restaurantLogo: string | null,
-    telegramChatId?: string | null
+    telegramChatId?: string | null,
+    primaryColor: string
 }) {
     const t = useTranslations('Index')
     const router = useRouter()
@@ -48,6 +64,18 @@ export function ThemeTwoMenu({
     const { items, addItem, updateQuantity, removeItem, totalPrice } = useCartStore()
     const [isMounted, setIsMounted] = useState(false)
     const [selectedKitchenId, setSelectedKitchenId] = useState<string | null>(null)
+
+    // Calculate dynamic styles
+    const safeColor = isValidHex(primaryColor) ? primaryColor : '#000000'
+    const foregroundColor = getContrastColor(safeColor)
+
+    // CSS variables to inject
+    const dynamicStyle = {
+        // @ts-ignore
+        "--primary": safeColor,
+        "--primary-foreground": foregroundColor,
+        "--ring": safeColor,
+    } as React.CSSProperties
 
     useEffect(() => {
         setIsMounted(true)
@@ -330,72 +358,75 @@ export function ThemeTwoMenu({
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="bottom" className="h-[90vh] flex flex-col sm:max-w-md sm:mx-auto rounded-t-2xl">
-                            <SheetHeader className="mb-4 px-6 pt-2">
-                                <SheetTitle className="text-xl">{t('your_order')}</SheetTitle>
-                            </SheetHeader>
+                            {/* Inject styles here for the portal content */}
+                            <div className="contents" style={dynamicStyle}>
+                                <SheetHeader className="mb-4 px-6 pt-2">
+                                    <SheetTitle className="text-xl">{t('your_order')}</SheetTitle>
+                                </SheetHeader>
 
-                            {/* Cart Items List */}
-                            <div className="flex-1 overflow-y-auto space-y-4 pb-4 px-6">
-                                {items.map(item => (
-                                    <div key={item.id} className="flex flex-col gap-3 border-b pb-4 last:border-0 border-border/50">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1 min-w-0 pr-4">
-                                                <div className="font-semibold text-base truncate">{getLocalized(item.product, 'name')}</div>
+                                {/* Cart Items List */}
+                                <div className="flex-1 overflow-y-auto space-y-4 pb-4 px-6">
+                                    {items.map(item => (
+                                        <div key={item.id} className="flex flex-col gap-3 border-b pb-4 last:border-0 border-border/50">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1 min-w-0 pr-4">
+                                                    <div className="font-semibold text-base truncate">{getLocalized(item.product, 'name')}</div>
 
-                                                {/* Options Display */}
-                                                {(item.selectedOptions || []).length > 0 && (
-                                                    <div className="mt-2 text-sm space-y-1">
-                                                        {item.selectedOptions.map((opt, i) => {
-                                                            const parts = opt.name.split(': ')
-                                                            const name = parts.length > 1 ? parts[1] : parts[0]
-                                                            return (
-                                                                <div key={i} className="flex justify-between text-muted-foreground">
-                                                                    <span>• {name}</span>
-                                                                    {opt.price > 0 && <span className="text-xs font-medium">+{opt.price} ₸</span>}
-                                                                </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                )}
+                                                    {/* Options Display */}
+                                                    {(item.selectedOptions || []).length > 0 && (
+                                                        <div className="mt-2 text-sm space-y-1">
+                                                            {item.selectedOptions.map((opt, i) => {
+                                                                const parts = opt.name.split(': ')
+                                                                const name = parts.length > 1 ? parts[1] : parts[0]
+                                                                return (
+                                                                    <div key={i} className="flex justify-between text-muted-foreground">
+                                                                        <span>• {name}</span>
+                                                                        {opt.price > 0 && <span className="text-xs font-medium">+{opt.price} ₸</span>}
+                                                                    </div>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="text-right font-bold w-24 shrink-0">
+                                                    {(item.product.price + (item.selectedOptions?.reduce((a, b) => a + b.price, 0) || 0)) * item.quantity} ₸
+                                                </div>
                                             </div>
-                                            <div className="text-right font-bold w-24 shrink-0">
-                                                {(item.product.price + (item.selectedOptions?.reduce((a, b) => a + b.price, 0) || 0)) * item.quantity} ₸
+
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-sm text-muted-foreground">
+                                                    {item.product.price + (item.selectedOptions?.reduce((a, b) => a + b.price, 0) || 0)} ₸ x {item.quantity}
+                                                </div>
+                                                <div className="flex items-center gap-3 bg-secondary/50 rounded-full px-1 py-1 shadow-sm border border-border/50">
+                                                    <button
+                                                        className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+                                                        onClick={() => {
+                                                            if (item.quantity > 1) updateQuantity(item.id, item.quantity - 1)
+                                                            else removeItem(item.id)
+                                                        }}
+                                                    >
+                                                        <Minus className="w-3 h-3" />
+                                                    </button>
+                                                    <span className="w-6 text-center font-bold text-sm tabular-nums">{item.quantity}</span>
+                                                    <button
+                                                        className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    >
+                                                        <Plus className="w-3 h-3" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-sm text-muted-foreground">
-                                                {item.product.price + (item.selectedOptions?.reduce((a, b) => a + b.price, 0) || 0)} ₸ x {item.quantity}
-                                            </div>
-                                            <div className="flex items-center gap-3 bg-secondary/50 rounded-full px-1 py-1 shadow-sm border border-border/50">
-                                                <button
-                                                    className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm active:scale-95 transition-transform"
-                                                    onClick={() => {
-                                                        if (item.quantity > 1) updateQuantity(item.id, item.quantity - 1)
-                                                        else removeItem(item.id)
-                                                    }}
-                                                >
-                                                    <Minus className="w-3 h-3" />
-                                                </button>
-                                                <span className="w-6 text-center font-bold text-sm tabular-nums">{item.quantity}</span>
-                                                <button
-                                                    className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-sm active:scale-95 transition-transform"
-                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                >
-                                                    <Plus className="w-3 h-3" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t pt-4 pb-8 px-6 space-y-4 bg-background">
-                                <div className="flex justify-between text-xl font-bold">
-                                    <span>{t('total')}</span>
-                                    <span>{totalPrice()} ₸</span>
+                                    ))}
                                 </div>
-                                <Button className="w-full h-14 text-lg rounded-xl shadow-lg font-bold">{t('checkout')}</Button>
+
+                                <div className="border-t pt-4 pb-8 px-6 space-y-4 bg-background">
+                                    <div className="flex justify-between text-xl font-bold">
+                                        <span>{t('total')}</span>
+                                        <span>{totalPrice()} ₸</span>
+                                    </div>
+                                    <Button className="w-full h-14 text-lg rounded-xl shadow-lg font-bold">{t('checkout')}</Button>
+                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>

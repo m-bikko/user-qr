@@ -50,6 +50,7 @@ export default async function SettingsPage(props: Props) {
                     restaurantId={restaurant.id}
                     initialChatId={restaurant.telegram_chat_id || ''}
                     initialTheme={restaurant.theme || 'default'}
+                    initialColor={restaurant.primary_color || '#000000'}
                 />
             </div>
         </div>
