@@ -12,7 +12,7 @@ export default async function MenuPage({
     // Fetch restaurant
     const { data: restaurant } = await supabase
         .from('restaurants')
-        .select('id, name, logo_url')
+        .select('id, name, logo_url, theme, telegram_chat_id')
         .eq('slug', restaurantSlug)
         .single()
 
@@ -48,6 +48,8 @@ export default async function MenuPage({
                 restaurantSlug={restaurantSlug}
                 restaurantName={restaurant.name}
                 restaurantLogo={restaurant.logo_url}
+                theme={restaurant.theme || 'default'}
+                telegramChatId={restaurant.telegram_chat_id}
             />
         </div>
     )

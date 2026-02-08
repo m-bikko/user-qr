@@ -19,7 +19,14 @@
         "welcome_title": "Welcome",
         "select_restaurant": "Please select a restaurant to view the menu",
         "no_categories": "No categories found",
-        "no_products": "No products found"
+        "no_products": "No products found",
+        "leave_feedback": "Leave Feedback",
+        "feedback_description": "We value your opinion! Please share your thoughts and up to 3 photos.",
+        "your_comment": "Your Comment",
+        "feedback_placeholder": "Tell us what you liked or how we can improve...",
+        "attach_photos": "Attach Photos",
+        "send_feedback": "Send Feedback",
+        "feedback_sent": "Thank you! Your feedback has been sent."
     },
     "Admin": {
         "dashboard": "Dashboard",
@@ -129,6 +136,21 @@
         "email": "Email",
         "joined": "Joined",
         "no_users_found": "No users found.",
-        "manager": "Manager"
+        "manager": "Manager",
+        "theme_branding": "Theme & Branding",
+        "theme_branding_description": "Customize your menu's appearance.",
+        "menu_layout": "Menu Layout",
+        "theme_default": "Default (Detailed)",
+        "theme_modern": "Modern (Grid)",
+        "unauthorized_action": "You are not authorized to perform this action.",
+        "theme_updated_success": "Theme updated successfully!",
+        "settings": "Settings",
+        "telegram_config_title": "Telegram Bot Configuration",
+        "telegram_config_desc": "Configure where feedback notifications are sent.",
+        "telegram_chat_id": "Telegram Chat ID",
+        "telegram_instruction_1": "1. Open <link>@userinfobot</link>.",
+        "telegram_instruction_2": "2. Press /start.",
+        "telegram_instruction_3": "3. Copy the ID number and paste it here.",
+        "telegram_instruction_4": "4. Press /start on <link>@userQRFeedbackBot</link> to allow messages."
     }
 }

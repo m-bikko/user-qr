@@ -19,7 +19,14 @@
         "welcome_title": "Добро пожаловать",
         "select_restaurant": "Пожауйста выберите ресторан",
         "no_categories": "Категории не найдены",
-        "no_products": "Продукты не найдены"
+        "no_products": "Продукты не найдены",
+        "leave_feedback": "Оставить отзыв",
+        "feedback_description": "Нам важно ваше мнение! Поделитесь мыслями и прикрепите до 3 фото.",
+        "your_comment": "Ваш комментарий",
+        "feedback_placeholder": "Расскажите, что понравилось или что улучшить...",
+        "attach_photos": "Прикрепить фото",
+        "send_feedback": "Отправить отзыв",
+        "feedback_sent": "Спасибо! Ваш отзыв отправлен."
     },
     "Admin": {
         "dashboard": "Дашборд",
@@ -129,6 +136,21 @@
         "email": "Email",
         "joined": "Присоединился",
         "no_users_found": "Пользователи не найдены.",
-        "manager": "Менеджер"
+        "manager": "Менеджер",
+        "theme_branding": "Тема и Брендинг",
+        "theme_branding_description": "Настройте внешний вид вашего меню.",
+        "menu_layout": "Макет Меню",
+        "theme_default": "По умолчанию (Детальный)",
+        "theme_modern": "Современный (Сетка)",
+        "unauthorized_action": "У вас нет прав для выполнения этого действия.",
+        "theme_updated_success": "Тема успешно обновлена!",
+        "settings": "Настройки",
+        "telegram_config_title": "Настройка Telegram бота",
+        "telegram_config_desc": "Настройте, куда будут приходить уведомления об отзывах.",
+        "telegram_chat_id": "Telegram Chat ID",
+        "telegram_instruction_1": "1. Откройте <link>@userinfobot</link>.",
+        "telegram_instruction_2": "2. Нажмите /start.",
+        "telegram_instruction_3": "3. Скопируйте полученный ID и вставьте его сюда.",
+        "telegram_instruction_4": "4. Нажмите /start в <link>@userQRFeedbackBot</link>, чтобы разрешить сообщения."
     }
 }

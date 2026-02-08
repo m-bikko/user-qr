@@ -19,7 +19,14 @@
         "welcome_title": "Қош келдіңіз",
         "select_restaurant": "Мәзірді көру үшін мейрамхананы таңдаңыз",
         "no_categories": "Санаттар табылмады",
-        "no_products": "Өнімдер табылмады"
+        "no_products": "Өнімдер табылмады",
+        "leave_feedback": "Пікір қалдыру",
+        "feedback_description": "Сіздің пікіріңіз маңызды! Ойыңызбен бөлісіп, 3 фотосуретке дейін жүктеңіз.",
+        "your_comment": "Сіздің пікіріңіз",
+        "feedback_placeholder": "Не ұнағанын немесе нені жақсарту керектігін айтыңыз...",
+        "attach_photos": "Фотосурет тіркеу",
+        "send_feedback": "Пікірді жіберу",
+        "feedback_sent": "Рахмет! Пікіріңіз жіберілді."
     },
     "Admin": {
         "dashboard": "Басқару тақтасы",
@@ -129,6 +136,21 @@
         "email": "Email",
         "joined": "Қосылды",
         "no_users_found": "Пайдаланушылар табылмады.",
-        "manager": "Менеджер"
+        "manager": "Менеджер",
+        "theme_branding": "Тақырып және Бренд",
+        "theme_branding_description": "Мәзіріңіздің сыртқы түрін баптаңыз.",
+        "menu_layout": "Мәзір макеті",
+        "theme_default": "Әдепкі (Толық)",
+        "theme_modern": "Заманауи (Тор)",
+        "unauthorized_action": "Сіздің бұл әрекетті орындауға құқығыңыз жоқ.",
+        "theme_updated_success": "Тақырып сәтті жаңартылды!",
+        "settings": "Баптаулар",
+        "telegram_config_title": "Telegram ботын баптау",
+        "telegram_config_desc": "Пікір туралы хабарламалар қайда жіберілетінін баптаңыз.",
+        "telegram_chat_id": "Telegram Chat ID",
+        "telegram_instruction_1": "1. <link>@userinfobot</link> ашыңыз.",
+        "telegram_instruction_2": "2. /start басыңыз.",
+        "telegram_instruction_3": "3. Келген ID нөмірін көшіріп, осында қойыңыз.",
+        "telegram_instruction_4": "4. Хабарлама алу үшін <link>@userQRFeedbackBot</link>-та /start басыңыз."
     }
 }

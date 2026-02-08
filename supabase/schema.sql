@@ -59,3 +59,9 @@ create policy "Allow public read recommendations" on public.product_recommendati
 create policy "Allow anon full access categories" on public.categories for all using (true);
 create policy "Allow anon full access products" on public.products for all using (true);
 create policy "Allow anon full access recommendations" on public.product_recommendations for all using (true);
+
+-- Add theme column to restaurants table
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS theme TEXT DEFAULT 'default';
+
+-- Add Telegram Chat ID to Restaurants
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS telegram_chat_id TEXT;

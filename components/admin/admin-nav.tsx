@@ -106,6 +106,11 @@ export function AdminNav({
             href: `/${locale}/admin/products`,
             show: !!selectedRestaurantId
         },
+        {
+            title: t('settings'),
+            href: `/${locale}/admin/settings`,
+            show: !!selectedRestaurantId
+        },
     ]
 
     return (

@@ -7,6 +7,7 @@ export async function createRestaurantAction(prevState: any, formData: FormData)
     const name = formData.get('name') as string
     const slug = formData.get('slug') as string
     const logo_url = formData.get('logo_url') as string
+    const theme = formData.get('theme') as string || 'default'
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
@@ -34,7 +35,7 @@ export async function createRestaurantAction(prevState: any, formData: FormData)
         // 2. Create Restaurant
         const { data: restaurantData, error: restaurantError } = await supabase
             .from('restaurants')
-            .insert({ name, slug, logo_url })
+            .insert({ name, slug, logo_url, theme })
             .select()
             .single()
 

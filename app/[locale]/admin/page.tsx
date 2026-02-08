@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Utensils, List, Package, ExternalLink } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { QrCodeCard } from '@/components/admin/qr-code-card';
+import { ThemeSwitcher } from '@/components/admin/theme-switcher';
 
 async function getStats() {
     const supabase = await createClient();
@@ -27,13 +28,15 @@ async function getStats() {
         { count: productsCount },
         { count: categoriesCount },
         { count: kitchensCount },
-        { data: restaurant }
+        { data: restaurantPromise }
     ] = await Promise.all([
         supabase.from('products').select('*', { count: 'exact', head: true }).eq('restaurant_id', restaurantId),
         supabase.from('categories').select('*', { count: 'exact', head: true }).eq('restaurant_id', restaurantId),
         supabase.from('kitchens').select('*', { count: 'exact', head: true }).eq('restaurant_id', restaurantId),
-        supabase.from('restaurants').select('*').eq('id', restaurantId).single()
+        supabase.from('restaurants').select('*, theme').eq('id', restaurantId).single()
     ]);
+
+    const restaurant = restaurantPromise as any // Cast to avoid strict type issues if types/supabase isn't perfect yet
 
     return {
         productsCount: productsCount || 0,
@@ -135,13 +138,18 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
                     </CardContent>
                 </Card>
 
-                <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                <div className="col-span-1 md:col-span-2 lg:col-span-3 space-y-4">
                     <QrCodeCard
                         publicUrl={publicUrl}
                         restaurantName={restaurant.name}
                         logoUrl={restaurant.logo_url}
                         testLinkText={t('test_link')}
                         title={t('menu_qr_code')}
+                    />
+
+                    <ThemeSwitcher
+                        restaurantId={restaurant.id}
+                        initialTheme={restaurant.theme || 'default'}
                     />
                 </div>
             </div>

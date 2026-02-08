@@ -19,6 +19,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { Plus, Loader2, Edit, Trash2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import imageCompression from 'browser-image-compression'
@@ -28,6 +35,7 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
+// ... existing imports
 
 type Restaurant = {
     id: string
@@ -35,6 +43,7 @@ type Restaurant = {
     slug: string
     logo_url: string | null
     created_at: string
+    theme?: string
 }
 
 export default function RestaurantsPage() {
@@ -48,6 +57,7 @@ export default function RestaurantsPage() {
     const [name, setName] = useState("")
     const [slug, setSlug] = useState("")
     const [logoUrl, setLogoUrl] = useState("")
+    const [theme, setTheme] = useState("default")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [saving, setSaving] = useState(false)
@@ -85,6 +95,7 @@ export default function RestaurantsPage() {
             setName(restaurant.name)
             setSlug(restaurant.slug)
             setLogoUrl(restaurant.logo_url || "")
+            setTheme(restaurant.theme || "default")
             setEmail("")
             setPassword("")
         } else {
@@ -92,6 +103,7 @@ export default function RestaurantsPage() {
             setName("")
             setSlug("")
             setLogoUrl("")
+            setTheme("default")
             setEmail("")
             setPassword("")
         }
@@ -145,7 +157,7 @@ export default function RestaurantsPage() {
         setSaving(true)
 
         if (editingRestaurant) {
-            const payload = { name, slug, logo_url: logoUrl || null }
+            const payload = { name, slug, logo_url: logoUrl || null, theme }
             const { error } = await supabase
                 .from('restaurants')
                 .update(payload)
@@ -163,6 +175,7 @@ export default function RestaurantsPage() {
             formData.append('name', name)
             formData.append('slug', slug)
             formData.append('logo_url', logoUrl)
+            formData.append('theme', theme)
             formData.append('email', email)
             formData.append('password', password)
 
@@ -256,6 +269,18 @@ export default function RestaurantsPage() {
                                 </>
                             )}
 
+                            <div className="space-y-2">
+                                <Label>Theme</Label>
+                                <Select value={theme} onValueChange={setTheme}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a theme" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="default">Default (Detailed)</SelectItem>
+                                        <SelectItem value="modern">Modern (Grid)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="space-y-2">
                                 <Label>{t('logo')}</Label>
                                 <div className="flex items-center gap-4">
