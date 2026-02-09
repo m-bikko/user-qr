@@ -14,6 +14,7 @@ export function MenuClient({
     products,
     restaurantSlug,
     restaurantName,
+    restaurantId,
     restaurantLogo,
     theme = 'default',
     telegramChatId,
@@ -25,6 +26,7 @@ export function MenuClient({
     products: Product[],
     restaurantSlug: string,
     restaurantName: string,
+    restaurantId: string,
     restaurantLogo: string | null,
     theme?: string,
     telegramChatId?: string | null,
@@ -39,6 +41,7 @@ export function MenuClient({
                 products={products}
                 restaurantSlug={restaurantSlug}
                 restaurantName={restaurantName}
+                restaurantId={restaurantId}
                 restaurantLogo={restaurantLogo}
                 telegramChatId={telegramChatId}
                 primaryColor={primaryColor}
@@ -55,6 +58,7 @@ export function MenuClient({
             products={products}
             restaurantSlug={restaurantSlug}
             restaurantName={restaurantName}
+            restaurantId={restaurantId}
             restaurantLogo={restaurantLogo}
             telegramChatId={telegramChatId}
             primaryColor={primaryColor}

@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-// @ts-ignore
-import heic2any from "heic2any"
+
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -61,6 +60,10 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                     // Check for HEIC
                     if (fileType === 'image/heic' || fileType === 'image/heif' || fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
                         try {
+                            // Dynamically import heic2any to avoid SSR "window is not defined" error
+                            // @ts-ignore
+                            const heic2any = (await import("heic2any")).default
+
                             const convertedBlob = await heic2any({
                                 blob: file,
                                 toType: "image/jpeg",

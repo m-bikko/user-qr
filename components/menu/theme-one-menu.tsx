@@ -45,6 +45,7 @@ export function ThemeOneMenu({
     products,
     restaurantSlug,
     restaurantName,
+    restaurantId,
     restaurantLogo,
     telegramChatId,
     primaryColor,
@@ -55,6 +56,7 @@ export function ThemeOneMenu({
     products: Product[],
     restaurantSlug: string,
     restaurantName: string,
+    restaurantId: string,
     restaurantLogo: string | null,
     telegramChatId?: string | null,
     primaryColor: string,
@@ -443,7 +445,7 @@ export function ThemeOneMenu({
                 </div>
             )}
 
-            <FeedbackButton restaurantId={products[0]?.restaurant_id || ""} telegramChatId={telegramChatId || null} />
+            <FeedbackButton restaurantId={restaurantId} telegramChatId={telegramChatId || null} />
         </div>
     )
 }

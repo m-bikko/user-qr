@@ -47,6 +47,7 @@ export default async function MenuPage({
                 products={products || []}
                 restaurantSlug={restaurantSlug}
                 restaurantName={restaurant.name}
+                restaurantId={restaurant.id}
                 restaurantLogo={restaurant.logo_url}
                 theme={restaurant.theme || 'default'}
                 telegramChatId={restaurant.telegram_chat_id}
