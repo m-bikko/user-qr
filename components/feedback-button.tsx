@@ -57,27 +57,9 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                     const fileType = file.type.toLowerCase()
                     const fileName = file.name.toLowerCase()
 
-                    // Check for HEIC
-                    if (fileType === 'image/heic' || fileType === 'image/heif' || fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
-                        try {
-                            // Dynamically import heic2any to avoid SSR "window is not defined" error
-                            // @ts-ignore
-                            const heic2any = (await import("heic2any")).default
-
-                            const convertedBlob = await heic2any({
-                                blob: file,
-                                toType: "image/jpeg",
-                                quality: 0.8
-                            })
-
-                            const blobToUse = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob
-                            const newName = fileName.replace(/\.(heic|heif)$/, ".jpg")
-                            const convertedFile = new File([blobToUse], newName, { type: "image/jpeg" })
-                            processedFiles.push(convertedFile)
-                        } catch (err) {
-                            console.error("HEIC conversion failed", err)
-                            alert(t('heic_conversion_failed', { defaultMessage: `Failed to process ${file.name}` }))
-                        }
+                    // Check for JPG/PNG
+                    if (fileType === 'image/jpeg' || fileType === 'image/png') {
+                        processedFiles.push(file)
                     }
                     // Check for JPG/PNG
                     else if (fileType === 'image/jpeg' || fileType === 'image/png') {
@@ -89,7 +71,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                 }
 
                 if (processedFiles.length === 0 && inputFiles.length > 0) {
-                    alert(t('invalid_file_type', { defaultMessage: "Only JPG, PNG and HEIC images are allowed" }))
+                    alert(t('invalid_file_type', { defaultMessage: "Only JPG and PNG images are allowed" }))
                 }
 
                 if (photos.length + processedFiles.length > 3) {
@@ -226,7 +208,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                                     type="file"
                                     ref={fileInputRef}
                                     className="hidden"
-                                    accept="image/jpeg,image/png,image/heic,image/heif,.heic,.heif"
+                                    accept="image/jpeg,image/png"
                                     multiple
                                     onChange={handleFileChange}
                                 />
