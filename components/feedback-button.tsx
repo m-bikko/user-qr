@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+// @ts-ignore
+import heic2any from "heic2any"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -15,11 +17,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { MessageSquare, Image as ImageIcon, X, Loader2, Send, Star } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { sendFeedbackAction } from "@/actions/send-feedback" // Server Action
+import { sendFeedbackAction } from "@/actions/send-feedback"
 import Image from "next/image"
 
 export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId: string, telegramChatId: string | null }) {
-    const t = useTranslations('Index') // Assuming general translations
+    const t = useTranslations('Index')
     const [open, setOpen] = useState(false)
     const [comment, setComment] = useState("")
     const [rating, setRating] = useState(5)
@@ -28,7 +30,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
     const [loading, setLoading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    if (!telegramChatId) return null // Don't show if not configured
+    if (!telegramChatId) return null
 
     // Manage previews
     useEffect(() => {
@@ -40,20 +42,69 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
         const newPreviews = photos.map(file => URL.createObjectURL(file))
         setPreviews(newPreviews)
 
-        // Cleanup function to revoke URLs when component unmounts or photos change
         return () => {
             newPreviews.forEach(url => URL.revokeObjectURL(url))
         }
     }, [photos])
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const newFiles = Array.from(e.target.files)
-            if (photos.length + newFiles.length > 3) {
-                alert("Maximum 3 photos allowed")
-                return
+            setLoading(true)
+            const inputFiles = Array.from(e.target.files)
+            const processedFiles: File[] = []
+
+            try {
+                for (const file of inputFiles) {
+                    const fileType = file.type.toLowerCase()
+                    const fileName = file.name.toLowerCase()
+
+                    // Check for HEIC
+                    if (fileType === 'image/heic' || fileType === 'image/heif' || fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
+                        try {
+                            const convertedBlob = await heic2any({
+                                blob: file,
+                                toType: "image/jpeg",
+                                quality: 0.8
+                            })
+
+                            const blobToUse = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob
+                            const newName = fileName.replace(/\.(heic|heif)$/, ".jpg")
+                            const convertedFile = new File([blobToUse], newName, { type: "image/jpeg" })
+                            processedFiles.push(convertedFile)
+                        } catch (err) {
+                            console.error("HEIC conversion failed", err)
+                            alert(t('heic_conversion_failed', { defaultMessage: `Failed to process ${file.name}` }))
+                        }
+                    }
+                    // Check for JPG/PNG
+                    else if (fileType === 'image/jpeg' || fileType === 'image/png') {
+                        processedFiles.push(file)
+                    } else {
+                        // Skip other types or warn
+                        // strict check: ignore them
+                    }
+                }
+
+                if (processedFiles.length === 0 && inputFiles.length > 0) {
+                    alert(t('invalid_file_type', { defaultMessage: "Only JPG, PNG and HEIC images are allowed" }))
+                }
+
+                if (photos.length + processedFiles.length > 3) {
+                    alert("Maximum 3 photos allowed")
+                } else {
+                    setPhotos(prev => {
+                        const newTotal = [...prev, ...processedFiles]
+                        if (newTotal.length > 3) return newTotal.slice(0, 3)
+                        return newTotal
+                    })
+                }
+
+            } catch (error) {
+                console.error("Error processing files", error)
+            } finally {
+                setLoading(false)
+                if (fileInputRef.current) fileInputRef.current.value = ''
             }
-            setPhotos(prev => [...prev, ...newFiles])
         }
     }
 
@@ -66,7 +117,6 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
 
         setLoading(true)
 
-        // Convert files to base64 or FormData based on how we handle it
         const formData = new FormData()
         formData.append('restaurantId', restaurantId)
         formData.append('comment', comment)
@@ -161,7 +211,11 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                                             onClick={() => fileInputRef.current?.click()}
                                             className="w-16 h-16 rounded-md border-2 border-dashed border-muted flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
                                         >
-                                            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                                            {loading ? (
+                                                <Loader2 className="h-6 w-6 text-muted-foreground animate-spin" />
+                                            ) : (
+                                                <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -169,7 +223,7 @@ export function FeedbackButton({ restaurantId, telegramChatId }: { restaurantId:
                                     type="file"
                                     ref={fileInputRef}
                                     className="hidden"
-                                    accept="image/*"
+                                    accept="image/jpeg,image/png,image/heic,image/heif,.heic,.heif"
                                     multiple
                                     onChange={handleFileChange}
                                 />

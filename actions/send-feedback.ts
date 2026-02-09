@@ -28,7 +28,12 @@ export async function sendFeedbackAction(formData: FormData) {
     for (let i = 0; i < 3; i++) {
         const photo = formData.get(`photo_${i}`)
         if (photo instanceof File) {
-            photos.push(photo)
+            // Validate file type (server-side check)
+            if (photo.type === 'image/jpeg' || photo.type === 'image/png') {
+                photos.push(photo)
+            } else {
+                console.warn(`Skipping unsupported file type: ${photo.type}`)
+            }
         }
     }
 
@@ -104,17 +109,27 @@ async function sendTelegramPhoto(chatId: string, photo: File, caption: string) {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`
     const formData = new FormData()
     formData.append('chat_id', chatId)
-    formData.append('photo', photo)
+
+    const buffer = Buffer.from(await photo.arrayBuffer())
+
+    // Ensure filename has an extension and is safe
+    let filename = photo.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    if (!filename.includes('.')) filename += '.jpg'
+
+    // valid for environment with global FormData (Node 18+)
+    formData.append('photo', new Blob([buffer]), filename)
     formData.append('caption', caption)
     formData.append('parse_mode', 'HTML')
 
     const res = await fetch(url, {
         method: 'POST',
+        // @ts-ignore
         body: formData,
     })
 
     if (!res.ok) {
         const err = await res.text()
+        console.error("Telegram Photo Error Response:", err)
         throw new Error(`Telegram API Error (Photo): ${err}`)
     }
 }
@@ -133,17 +148,28 @@ async function sendTelegramMediaGroup(chatId: string, photos: File[], caption: s
 
     formData.append('media', JSON.stringify(media))
 
-    photos.forEach((photo, index) => {
-        formData.append(`photo_${index}`, photo)
-    })
+    // Use sequential loop to ensure deterministic order and avoid race conditions
+    for (let index = 0; index < photos.length; index++) {
+        const photo = photos[index]
+        const buffer = Buffer.from(await photo.arrayBuffer())
+
+        // Ensure filename has an extension and is safe
+        let filename = photo.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+        if (!filename.includes('.')) filename += '.jpg'
+
+        const blob = new Blob([buffer], { type: photo.type || 'image/jpeg' })
+        formData.append(`photo_${index}`, blob, filename)
+    }
 
     const res = await fetch(url, {
         method: 'POST',
+        // @ts-ignore
         body: formData,
     })
 
     if (!res.ok) {
         const err = await res.text()
+        console.error("Telegram MediaGroup Error Response:", err)
         throw new Error(`Telegram API Error (MediaGroup): ${err}`)
     }
 }
