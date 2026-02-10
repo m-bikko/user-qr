@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase-server"
 import { revalidatePath } from "next/cache"
 import { getTranslations } from "next-intl/server"
 
-export async function updateRestaurantSettingsAction(restaurantId: string, data: { telegram_chat_id?: string, primary_color?: string, background_color?: string }) {
+export async function updateRestaurantSettingsAction(restaurantId: string, data: { telegram_chat_id?: string, primary_color?: string, background_color?: string, commission_percentage?: number }) {
     const supabase = await createClient()
     const t = await getTranslations('Admin')
 

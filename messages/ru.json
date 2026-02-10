@@ -26,7 +26,8 @@
         "feedback_placeholder": "Расскажите, что понравилось или что улучшить...",
         "attach_photos": "Прикрепить фото",
         "send_feedback": "Отправить отзыв",
-        "feedback_sent": "Спасибо! Ваш отзыв отправлен."
+        "feedback_sent": "Спасибо! Ваш отзыв отправлен.",
+        "commission_display": "Сервисный сбор: {percentage}%"
     },
     "Admin": {
         "dashboard": "Дашборд",
@@ -156,6 +157,10 @@
         "appearance_config_desc": "Настройте цвета и брендинг.",
         "primary_color": "Основной цвет",
         "background_color": "Цвет фона",
-        "save_details": "Сохранить детали"
+        "save_details": "Сохранить детали",
+        "order_config_title": "Настройки заказа",
+        "order_config_desc": "Управление комиссиями и настройками.",
+        "commission_percentage": "Процент комиссии",
+        "commission_help": "Этот процент будет добавлен к общей сумме заказа."
     }
 }

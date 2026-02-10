@@ -49,7 +49,8 @@ export function ThemeOneMenu({
     restaurantLogo,
     telegramChatId,
     primaryColor,
-    backgroundColor
+    backgroundColor,
+    commissionPercentage
 }: {
     categories: Category[],
     kitchens: Kitchen[],
@@ -60,14 +61,22 @@ export function ThemeOneMenu({
     restaurantLogo: string | null,
     telegramChatId?: string | null,
     primaryColor: string,
-    backgroundColor: string
+    backgroundColor: string,
+    commissionPercentage?: number
 }) {
+
     const t = useTranslations('Index')
     const router = useRouter()
     const locale = useLocale()
-    const { items, addItem, updateQuantity, removeItem, totalPrice } = useCartStore()
+    const { items, addItem, updateQuantity, removeItem, totalPrice, setCommission } = useCartStore()
     const [isMounted, setIsMounted] = useState(false)
     const [selectedKitchenId, setSelectedKitchenId] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (commissionPercentage !== undefined) {
+            setCommission(commissionPercentage)
+        }
+    }, [commissionPercentage, setCommission])
 
     // Calculate dynamic styles
     const safeColor = isValidHex(primaryColor) ? primaryColor : '#000000'
@@ -182,6 +191,16 @@ export function ThemeOneMenu({
 
     return (
         <div className="relative min-h-screen pb-24 bg-background">
+            {/* Commission Banner */}
+            {commissionPercentage && commissionPercentage > 0 ? (
+                <div
+                    className="w-full py-2 text-center text-sm font-bold text-white shadow-sm z-50 relative"
+                    style={{ backgroundColor: primaryColor }}
+                >
+                    {t('commission_display', { percentage: commissionPercentage })}
+                </div>
+            ) : null}
+
             {/* Header / Lang Switcher */}
             <div className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-[53px]">
                 <div className="flex items-center gap-3">
@@ -433,6 +452,28 @@ export function ThemeOneMenu({
                                 </div>
 
                                 <div className="border-t pt-4 pb-12 px-6 space-y-4">
+                                    {commissionPercentage && commissionPercentage > 0 && (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between text-muted-foreground">
+                                                <span>{t('total')} (Subtotal)</span>
+                                                <span>
+                                                    {items.reduce((total, item) => {
+                                                        const optionsPrice = item.selectedOptions.reduce((acc, opt) => acc + opt.price, 0)
+                                                        return total + ((item.product.price + optionsPrice) * item.quantity)
+                                                    }, 0)} ₸
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between text-primary font-medium">
+                                                <span>{t('commission_display', { percentage: commissionPercentage })}</span>
+                                                <span>
+                                                    {Math.round(items.reduce((total, item) => {
+                                                        const optionsPrice = item.selectedOptions.reduce((acc, opt) => acc + opt.price, 0)
+                                                        return total + ((item.product.price + optionsPrice) * item.quantity)
+                                                    }, 0) * (commissionPercentage / 100))} ₸
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between text-xl font-bold">
                                         <span>{t('total')}</span>
                                         <span>{totalPrice()} ₸</span>

@@ -19,7 +19,8 @@ export function MenuClient({
     theme = 'default',
     telegramChatId,
     primaryColor,
-    backgroundColor
+    backgroundColor,
+    commissionPercentage
 }: {
     categories: Category[],
     kitchens: Kitchen[],
@@ -31,7 +32,8 @@ export function MenuClient({
     theme?: string,
     telegramChatId?: string | null,
     primaryColor: string,
-    backgroundColor: string
+    backgroundColor: string,
+    commissionPercentage: number
 }) {
     if (theme === 'modern') {
         return (
@@ -46,6 +48,7 @@ export function MenuClient({
                 telegramChatId={telegramChatId}
                 primaryColor={primaryColor}
                 backgroundColor={backgroundColor}
+                commissionPercentage={commissionPercentage}
             />
         )
     }
@@ -63,6 +66,7 @@ export function MenuClient({
             telegramChatId={telegramChatId}
             primaryColor={primaryColor}
             backgroundColor={backgroundColor}
+            commissionPercentage={commissionPercentage}
         />
     )
 }

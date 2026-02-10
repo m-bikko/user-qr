@@ -21,20 +21,24 @@ export function AdminSettingsForm({
     initialChatId,
     initialTheme,
     initialColor,
-    initialBackgroundColor
+    initialBackgroundColor,
+    initialCommission
 }: {
     restaurantId: string,
     initialChatId: string,
     initialTheme: string,
     initialColor?: string,
-    initialBackgroundColor?: string
+    initialBackgroundColor?: string,
+    initialCommission: number
 }) {
     const t = useTranslations('Admin')
     const [chatId, setChatId] = useState(initialChatId)
     const [primaryColor, setPrimaryColor] = useState(initialColor || '#000000')
     const [backgroundColor, setBackgroundColor] = useState(initialBackgroundColor || '#ffffff')
+    const [commission, setCommission] = useState(initialCommission || 0)
     const [loading, setLoading] = useState(false)
     const [loadingColor, setLoadingColor] = useState(false)
+    const [loadingCommission, setLoadingCommission] = useState(false)
 
     const handleSave = async () => {
         setLoading(true)
@@ -52,7 +56,19 @@ export function AdminSettingsForm({
         })
         if (result.error) alert(result.error)
         else alert(result.message)
+        if (result.error) alert(result.error)
+        else alert(result.message)
         setLoadingColor(false)
+    }
+
+    const handleSaveCommission = async () => {
+        setLoadingCommission(true)
+        const result = await updateRestaurantSettingsAction(restaurantId, {
+            commission_percentage: commission
+        })
+        if (result.error) alert(result.error)
+        else alert(result.message)
+        setLoadingCommission(false)
     }
 
     return (
@@ -141,6 +157,36 @@ export function AdminSettingsForm({
                     </div>
                     <Button onClick={handleSaveColor} disabled={loadingColor}>
                         {loadingColor && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {t('save_details')}
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {/* Order Settings (Commission) */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('order_config_title')}</CardTitle>
+                    <CardDescription>{t('order_config_desc')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="commission">{t('commission_percentage')}</Label>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                id="commission"
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={commission}
+                                onChange={(e) => setCommission(Number(e.target.value))}
+                                className="w-24"
+                            />
+                            <span>%</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{t('commission_help')}</p>
+                    </div>
+                    <Button onClick={handleSaveCommission} disabled={loadingCommission}>
+                        {loadingCommission && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {t('save_details')}
                     </Button>
                 </CardContent>

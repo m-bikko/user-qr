@@ -20,12 +20,16 @@ interface CartState {
     updateQuantity: (itemId: string, quantity: number) => void
     clearCart: () => void
     totalPrice: () => number
+    commissionPercentage: number
+    setCommission: (percentage: number) => void
 }
 
 export const useCartStore = create<CartState>()(
     persist(
         (set, get) => ({
             items: [],
+            commissionPercentage: 0,
+            setCommission: (percentage) => set({ commissionPercentage: percentage }),
             addItem: (product, quantity, options) => set((state) => {
                 const newItem: CartItem = {
                     id: Math.random().toString(36).substring(7),
@@ -50,10 +54,16 @@ export const useCartStore = create<CartState>()(
             clearCart: () => set({ items: [] }),
             totalPrice: () => {
                 const state = get()
-                return state.items.reduce((total, item) => {
+                const subtotal = state.items.reduce((total, item) => {
                     const optionsPrice = item.selectedOptions.reduce((acc, opt) => acc + opt.price, 0)
                     return total + ((item.product.price + optionsPrice) * item.quantity)
                 }, 0)
+
+                const commission = state.commissionPercentage > 0
+                    ? Math.round(subtotal * (state.commissionPercentage / 100))
+                    : 0
+
+                return subtotal + commission
             }
         }),
         {

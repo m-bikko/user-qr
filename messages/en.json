@@ -26,7 +26,8 @@
         "feedback_placeholder": "Tell us what you liked or how we can improve...",
         "attach_photos": "Attach Photos",
         "send_feedback": "Send Feedback",
-        "feedback_sent": "Thank you! Your feedback has been sent."
+        "feedback_sent": "Thank you! Your feedback has been sent.",
+        "commission_display": "Service Fee: {percentage}%"
     },
     "Admin": {
         "dashboard": "Dashboard",
@@ -156,6 +157,10 @@
         "appearance_config_desc": "Customize colors and branding.",
         "primary_color": "Primary Color",
         "background_color": "Background Color",
-        "save_details": "Save Details"
+        "save_details": "Save Details",
+        "order_config_title": "Order Configuration",
+        "order_config_desc": "Manage fees and order settings.",
+        "commission_percentage": "Commission Percentage",
+        "commission_help": "This percentage will be added to the customer's total order."
     }
 }

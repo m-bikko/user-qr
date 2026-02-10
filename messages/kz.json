@@ -26,7 +26,8 @@
         "feedback_placeholder": "Не ұнағанын немесе нені жақсарту керектігін айтыңыз...",
         "attach_photos": "Фотосурет тіркеу",
         "send_feedback": "Пікірді жіберу",
-        "feedback_sent": "Рахмет! Пікіріңіз жіберілді."
+        "feedback_sent": "Рахмет! Пікіріңіз жіберілді.",
+        "commission_display": "Қызмет көрсету ақысы: {percentage}%"
     },
     "Admin": {
         "dashboard": "Басқару тақтасы",
@@ -155,6 +156,10 @@
         "appearance_config_title": "Сыртқы көріністі баптау",
         "appearance_config_desc": "Түстер мен брендті баптаңыз.",
         "primary_color": "Негізгі түс",
-        "save_details": "Мәліметтерді сақтау"
+        "save_details": "Мәліметтерді сақтау",
+        "order_config_title": "Тапсырыс параметрлері",
+        "order_config_desc": "Комиссиялар мен параметрлерді басқару.",
+        "commission_percentage": "Комиссия пайызы",
+        "commission_help": "Бұл пайыз жалпы тапсырыс сомасына қосылады."
     }
 }

@@ -366,7 +366,7 @@ export function ProductClient({
         // Get products for this category, explicitly sorted
         const currentCategoryProducts = products
             .filter(p => p.category_id === categoryId)
-            .sort((a, b) => a.sort_order - b.sort_order)
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
         const oldIndex = currentCategoryProducts.findIndex(p => p.id === active.id)
         const newIndex = currentCategoryProducts.findIndex(p => p.id === over.id)
@@ -637,7 +637,7 @@ export function ProductClient({
                         categories.map((category) => {
                             const categoryProducts = products
                                 .filter(p => p.category_id === category.id)
-                                .sort((a, b) => a.sort_order - b.sort_order)
+                                .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
                             // Dynamic key access for localized name
                             const categoryName = category[`name_${locale}` as keyof typeof category] as string || category.name_en

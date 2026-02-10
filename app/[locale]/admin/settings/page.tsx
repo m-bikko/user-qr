@@ -52,6 +52,7 @@ export default async function SettingsPage(props: Props) {
                     initialTheme={restaurant.theme || 'default'}
                     initialColor={restaurant.primary_color || '#000000'}
                     initialBackgroundColor={restaurant.background_color || '#ffffff'}
+                    initialCommission={restaurant.commission_percentage || 0}
                 />
             </div>
         </div>

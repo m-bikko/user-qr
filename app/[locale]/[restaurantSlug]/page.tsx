@@ -12,7 +12,7 @@ export default async function MenuPage({
     // Fetch restaurant
     const { data: restaurant } = await supabase
         .from('restaurants')
-        .select('id, name, logo_url, theme, telegram_chat_id, primary_color, background_color')
+        .select('id, name, logo_url, theme, telegram_chat_id, primary_color, background_color, commission_percentage')
         .eq('slug', restaurantSlug)
         .single()
 
@@ -53,6 +53,7 @@ export default async function MenuPage({
                 telegramChatId={restaurant.telegram_chat_id}
                 primaryColor={restaurant.primary_color || '#000000'}
                 backgroundColor={restaurant.background_color || '#ffffff'}
+                commissionPercentage={restaurant.commission_percentage ?? 0}
             />
         </div>
     )
